@@ -77,6 +77,14 @@ p {
   margin-bottom: var(--spacing-xs);
 }
 
+.page-title {
+  font-family: var(--font-family);
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: var(--spacing-xs);
+}
+
 .tagline {
   font-style: italic;
   color: var(--text-secondary);
@@ -177,4 +185,49 @@ footer {
   h2 {
     font-size: 1.3rem;
   }
+}
+
+
+/* Architecture/Detail Pages */
+.architecture-page h2 {
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--accent-color);
+}
+
+.architecture-page code {
+  background: var(--bg-secondary);
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+
+.code-snippet {
+  background: var(--bg-secondary);
+  padding: 1rem;
+  border-left: 3px solid var(--accent-color);
+  margin: 1rem 0;
+  overflow-x: auto;
+}
+
+.entity-pattern {
+  background: var(--bg-secondary);
+  padding: 1.5rem;
+  border-radius: 5px;
+  margin: 1rem 0;
+}
+
+.entity-pattern ul {
+  list-style: none;
+  padding: 0;
+}
+
+.entity-pattern li {
+  padding: 0.3rem 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.entity-pattern li:last-child {
+  border-bottom: none;
 }

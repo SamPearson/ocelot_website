@@ -10,96 +10,104 @@
   <div class="container">
     <header class="main-header">
       <div class="company-name">Ocelot Code Systems</div>
-      <blockquote class="tagline">Architecture. Quality. Delivery.</blockquote>
-      <p class="subtitle">Production-ready software where architecture meets pragmatism.</p>
+      <blockquote class="tagline">Handcrafted quality at modern speed.</blockquote>
     </header>
 
-  <section class="content-section" id="mission">
-    <h2>Mission</h2>
-    <p>In an age of AI-generated code, Ocelot Code Systems delivers the human touch: whiteboarding systems, designing patterns, and building quality that scales without the debt.</p>
-    <p>We blend AI-assisted development with handcrafted code and rigorous human review, delivering requirements quickly while ensuring the quality and reliability that purely AI-generated code can miss.</p>
-  </section>
+    <section class="content-section" id="mission">
+      <h2>Mission</h2>
+      <p>Modern development tools have made writing software faster than ever. The challenge is keeping it understandable, maintainable, and reliable as it grows.
+        Ocelot Code Systems combines AI-assisted development with thoughtful architecture, testing, and human review to deliver software that's both fast to build and built to last.</p>
+    </section>
 
-  <section class="content-section" id="services">
-    <h2>Services</h2>
+    <section class="content-section" id="engineering-philosophy">
+      <h2>Engineering Philosophy</h2>
+      <p>Good software starts with good decisions; good engineering decisions age well.</p>
+      <p>Every featured project includes an architecture review explaining the design goals, tradeoffs, and implementation choices behind the finished application.</p>
+      <h3><a href="architecture_writeups/index.html">Read an Engineering Case Study</a></h3>
+    </section>
 
-    <article class="service-card" id="qa">
-      <h3>QA Engineering</h3>
-      <p>Shift-left testing that catches bugs before they reach production.</p>
-      <h4>What we do:</h4>
+
+    <section class="content-section" id="services">
+      <h2>Services</h2>
+
+      <article class="service-card" id="qa">
+        <h3>QA Engineering</h3>
+        <p>Shift-left testing that catches bugs before they reach production.</p>
+        <h4>What we do:</h4>
+        <ul>
+          <li>Test planning (smoke tests, in-depth feature testing, agile test development)</li>
+          <li>Manual Testing (webapps, desktop applications, APIs)</li>
+          <li>Test automation suites (Selenium, API testing, Pytest)</li>
+          <li>CI/CD integration (Jenkins/BitBucket pipelines etc)</li>
+        </ul>
+      </article>
+
+      <article class="service-card" id="backend">
+        <h3>Backend Development</h3>
+        <p>Backend systems designed to stay maintainable as your application grows. Built with Flask, SQLAlchemy, REST APIs, automated testing, and production deployment in mind.</p>
+        <h4>What we deliver:</h4>
+        <ul>
+          <li>Clean, layered architecture that's easy to maintain and extend</li>
+          <li>Clear separation of concerns for readable, manageable code</li>
+          <li>Production-ready deployment (systemd, nginx, Gunicorn, Jenkins CI/CD scripts)</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="content-section" id="projects">
+      <h2>Featured Projects</h2>
+
+      <article class="project-card" id="catchlist">
+        <h3><a href="https://github.com/SamPearson/catchlist_todo">Catchlist Todo App</a></h3>
+        <p><em>A CRUD todo app with full-stack implementation, demonstrating architecture and testing principles.</em></p>
+        <h4><a href="architecture_writeups/catchlist.html">Read the Engineering Review</a></h4>
+
+        <ul>
+          <li><strong>Architecture:</strong> Full webapp/API split with user registration and data isolation</li>
+          <li><strong>Infrastructure:</strong> Systemd services, nginx reverse proxy, Gunicorn</li>
+          <li><strong>CI/CD:</strong> Jenkins automation for staging/production deployments</li>
+          <li><strong>Testing:</strong> Selenium (frontend) and pytest (backend) test suites</li>
+        </ul>
+      </article>
+
+      <article class="project-card" id="testing">
+        <h3><a href="https://github.com/SamPearson/testing_the_internet">Testing the Internet</a></h3>
+        <p><em>Test case demonstrations for common webpage features.</em></p>
+        <ul>
+          <li><strong>Framework:</strong> Pytest with Sauce Labs and local execution</li>
+          <li><strong>Coverage:</strong> Dynamic loading, authentication, UI interactions</li>
+          <li><strong>Patterns:</strong> Feature- and depth-based test categorization</li>
+        </ul>
+  <!--      <h4><a href="architecture_writeups/testing_the_internet.html">Architecture Writeup</a></h4>-->
+
+      </article>
+    </section>
+
+    <section id="stack">
+      <h2>Tech Stack</h2>
       <ul>
-        <li>Manual Testing (webapps, desktop applications, APIs)</li>
-        <li>Test automation suites (Selenium, API testing, Pytest)</li>
-        <li>CI/CD integration (Jenkins pipelines etc)</li>
+        <li><strong>Languages:</strong> Python, JavaScript</li>
+        <li><strong>Backend:</strong> Flask, SQLAlchemy, RESTful APIs, JWT</li>
+        <li><strong>Testing:</strong> Selenium, Pytest, Sauce Labs</li>
+        <li><strong>DevOps:</strong> Jenkins, systemd, nginx, Gunicorn</li>
+        <li><strong>Architecture:</strong> 3-tier design, Dependency Injection, Service Pattern</li>
       </ul>
-    </article>
+    </section>
 
-    <article class="service-card" id="backend">
-      <h3>Backend Development</h3>
-      <p>Robust, maintainable backends built on Flask, SQLAlchemy, and RESTful APIs.</p>
-      <h4>What we deliver:</h4>
-      <ul>
-        <li>Clean architecture (3-tier: Models/Repositories/Services)</li>
-        <li>JWT authentication and secure user management</li>
-        <li>Layered design that's easy to extend</li>
-        <li>Production-ready deployment (systemd, nginx, Gunicorn)</li>
-      </ul>
-      <p><strong>The philosophy:</strong> Code that's not just functional, but <strong>maintainable</strong>. We design systems that scale without becoming spaghetti.</p>
-    </article>
-  </section>
+    <section id="contact">
+      <h2>Contact</h2>
+      <address>
+        <p>
+          <strong>Email:</strong> <a href="mailto:sam@ocelotcodesystems.com">sam@ocelotcodesystems.com</a><br>
+          <strong>GitHub:</strong> <a href="https://github.com/SamPearson">@SamPearson</a><br>
+          <strong>LinkedIn:</strong> <a href="https://www.linkedin.com/in/samedpearson/">in/samedpearson</a>
+        </p>
+      </address>
+    </section>
 
-  <section class="content-section" id="projects">
-    <h2>Selected Projects</h2>
-
-    <article class="project-card" id="catchlist">
-      <h3><a href="https://github.com/SamPearson/catchlist_todo">Catchlist Todo App</a></h3>
-      <p><em>A CRUD todo app with full-stack implementation, demonstrating architecture and testing principles.</em></p>
-      <ul>
-        <li><strong>Architecture:</strong> Full webapp/API split with user registration and data isolation</li>
-        <li><strong>Infrastructure:</strong> Systemd services, nginx reverse proxy, Gunicorn</li>
-        <li><strong>CI/CD:</strong> Jenkins automation for staging/production deployments</li>
-        <li><strong>Testing:</strong> Selenium (frontend) and pytest (backend) test suites</li>
-      <h4><a href="architecture_writeups/catchlist.html">Architecture Writeup</a></h4>        
-      </ul>
-    </article>
-
-    <article class="project-card" id="testing">
-      <h3><a href="https://github.com/SamPearson/testing_the_internet">Testing the Internet</a></h3>
-      <p><em>Test case demonstrations for common webpage features.</em></p>
-      <ul>
-        <li><strong>Framework:</strong> Pytest with Sauce Labs and local execution</li>
-        <li><strong>Coverage:</strong> Dynamic loading, authentication, UI interactions</li>
-        <li><strong>Patterns:</strong> Feature- and depth-based test categorization</li>
-      </ul>
-      <h4><a href="architecture_writeups/testing_the_internet.html">Architecture Writeup</a></h4>
-
-    </article>
-  </section>
-
-  <section id="stack">
-    <h2>Tech Stack</h2>
-    <ul>
-      <li><strong>Languages:</strong> Python, JavaScript</li>
-      <li><strong>Backend:</strong> Flask, SQLAlchemy, RESTful APIs, JWT</li>
-      <li><strong>Testing:</strong> Selenium, Pytest, Sauce Labs</li>
-      <li><strong>DevOps:</strong> Jenkins, systemd, nginx, Gunicorn</li>
-      <li><strong>Architecture:</strong> 3-tier design, Dependency Injection, Service Pattern</li>
-    </ul>
-  </section>
-
-  <section id="contact">
-    <h2>Contact</h2>
-    <address>
-      <p>
-        <strong>Email:</strong> <a href="mailto:sam@ocelotcodesystems.com">sam@ocelotcodesystems.com</a><br>
-        <strong>GitHub:</strong> <a href="https://github.com/SamPearson">@SamPearson</a><br>
-        <strong>LinkedIn:</strong> <a href="https://www.linkedin.com/in/samedpearson/">in/samedpearson</a>
-      </p>
-    </address>
-  </section>
-
-  <footer>
-    <p>&copy; 2026 Ocelot Code Systems. Built with intention, tested to prove.</p>
-  </footer>
+    <footer>
+      <p>&copy; 2026 Ocelot Code Systems. Built with intention, tested to prove.</p>
+    </footer>
+  </div>
 </body>
 </html>

@@ -1,1 +1,133 @@
-Coming Soon
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catchlist - Architecture Review</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+<div class="container architecture-page">
+    <header class="main-header">
+        <h1 class="page-title">Catchlist Architecture Review</h1>
+    </header>
+
+    <main>
+        <section class="content-section">
+            <h2>Project Overview</h2>
+            <p>Catchlist is primarily an effort to build a small application with the infrastructure and practices I'd expect to encounter in a commercial application: a frontend/backend split, dev/staging/production environments, CI/CD, automated testing, and an architecture where responsibilities have clear boundaries.</p>
+            <p>Catchlist is secondarily a productivity application; it intends to provide API and Webapp interfaces through which the user can manage "todo" tasks, projects, scheduled routines, and commitments, with reporting across daily/weekly/monthly/seasonal/annual timeframes.</p>
+
+            <h3>Tech Stack</h3>
+            <p>Catchlist uses</p>
+            <ul class="services-list">
+                <li>Python/Flask : webapp/api services</li>
+                <li>SQLAlchemy : database</li>
+                <li>Git and Jenkins : version control and deployment</li>
+                <li>Selenium/Pytest/Allure : test automation</li>
+            </ul>
+        </section>
+
+        <section class="content-section">
+            <h2>System Structure</h2>
+            <p>The guiding principle is that all behavior should have an obvious home. All entities follow a consistent pattern:</p>
+            <div class="entity-pattern">
+                    <pre>Entity (model)
+  ↓
+Repository (BaseRepository or UserOwnedRepository)
+  ↓
+Service (business logic, validation)
+  ↓
+Presenter (data transformation for API/webapp)
+  ↓
+API Routes (HTTP handlers)
+  ↓
+Webapp Routes</pre>
+            </div>
+
+            <h3>Model/Repository/Service Layers</h3>
+            <p><strong>Models</strong> define the shape of the application's data and its relationships in/to the database. Keeping models lightweight reduces coupling between persistence and application behavior, making them easier to understand, test and extend if necessary.</p>
+            <p><strong>Repositories</strong> handle persistence and ownership checks. <code>BaseRepository</code> provides generic CRUD, while <code>UserOwnedRepository</code> adds user-scoped access; entity-specific repositories extend these when they need specialized queries. Business workflows remain in services, allowing them to coordinate multiple repositories without embedding database logic.</p>
+            <p><strong>Services</strong> contain business rules and workflows, coordinating repositories for operations such as cascading calendar changes or completing project subtasks. Routes therefore remain thin and persistence concerns stay out of business logic.</p>
+
+            <h3>API Route Layers</h3>
+            <p><strong>Route Handler</strong> functions verify JWT tokens, ensure valid request shape, call service layer functions, and format the result into an http response.</p>
+
+            <h3>Deployment Strategy</h3>
+            <p>Development uses local orchestration scripts; staging/production use systemd/Gunicorn with Jenkins handling deployment and test execution.</p>
+        </section>
+
+        <section class="content-section">
+            <h2>Tradeoffs</h2>
+
+            <div class="service-card">
+                <h3>API / Webapp split</h3>
+                <p><strong>Drawback</strong><br>Building two services instead of one adds complexity to the deployment system and how data is accessed. Two launch scripts, two systemd service files, separate test frameworks, etc.</p>
+                <p><strong>Benefit</strong><br>The split enforces a separation between presentation code and backend logic, which makes testing, extension, and maintenance simpler. Additionally, the split enables a variety of ways to use the application. The webapp automatically supports both desktop and mobile usage, but an AI agent could use a read-only access token and the API documentation to perform bespoke reporting tasks.</p>
+                <p><strong>Reasoning</strong><br>Creating both an API and webapp is a pretty direct manifestation of "all behavior should have an obvious home". Small files with clear purposes are easy to read, write, understand, and transpose to similar use cases; a bit of complexity is a fair trade.</p>
+            </div>
+
+            <div class="service-card">
+                <h3>Timezone Strategy</h3>
+                <p>The typical advice for handling timestamps and timezones is "store everything in UTC, convert as far out towards the user as possible (ie the webapp or api routes). This is fine for instances, but recurring events can run into edge case issues with DST changes, so for recurring events (but not materialized instances of a recurring event), it's necessary to store the IANA timezone string, ical RRULE, and local time representation, which preserves the intent (eg every Tuesday at 9pm)</p>
+                <p><strong>Drawback</strong><br>More complex and non-uniform timezone handling. Some entities are just stored in UTC and the only conversion we need to do occurs when we convert user-provided times from the user's timezone to UTC; some entities store IANA timezone strings and require conversion elsewhere (eg creating instances of a recurring event)</p>
+                <p><strong>Benefit</strong><br>In addition to recurring routines now invisibly handling DST changes, we can allow a timezone parameter when creating sessions from routines, enabling a user to keep their routines going when visiting a different timezone without affecting previous sessions. It's generally a more flexible system which preserves intent.</p>
+                <p><strong>Reasoning</strong><br>Honestly, the application only has one user and supporting visits to different timezones is something we can get away with not doing, so it would have been possible and much simpler to just hardcode America/Chicago as the application's timezone or just ignore timezones completely. However, if this application gradually accumulates a lot of user data and then one day changing the timezone is needed, implementing handling for them becomes a much more perilous task. Far better to support this out of the box instead of inviting a huge data migration down the road and establishing a pattern of shrugging off functionality because there's only one user.</p>
+            </div>
+
+            <div class="service-card">
+                <h3>Explicitness over Minimalism</h3>
+                <p>This manifests in a few places but it's a design principle, so it should be represented throughout the application.</p>
+                <p>Most entities have an <code>EntityRepository</code> that's a pretty thin wrapper around the base repository. It would certainly be possible to refactor that out and fetch database entities directly from the service layer, but then there's no longer an obvious answer to where authentication checks should happen, and they'd probably get embedded into the service layer's business logic.</p>
+                <p>With an explicit repository layer, an operation such as changing a calendar's color can cascade the change down to all routines and sessions it owns by importing the associated repositories and using the update function without putting persistence logic for multiple entities in the service layer.</p>
+                <p>The existence of explicit <code>Timeframe</code> and <code>Commitment</code> entities are another example. They could be removed, replaced with lists of timestamps or start/end tuples on each schedulable entity. That would reduce the number of model/repo/service files, but reporting would immediately become more cumbersome because the application would need to reconstruct a list of commitments by examining each schedulable entity instead of resolving one timeframe and getting the connected list of commitments.</p>
+                <p>Simple is better than complex, but complex is better than complicated.</p>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <h2>Lessons Learned</h2>
+
+            <div class="service-card">
+                <h3>Modeling Recurring Events</h3>
+                <p>When dealing with timestamps/timezones, the common advice appears to be 'store everything in UTC and convert at the edge/frontend'. This works well for individual events. Recurring events complicate this: "every Tuesday at 10pm America/Chicago" describes a local time, not a fixed instant. Its UTC representation can change across DST transitions.</p>
+                <p>Catchlist's strategy for representing the schedules of recurring events evolved from the "convert at the edge, store in UTC", to a model that preserves the schedule's intent:</p>
+                <ul>
+                    <li>Store the user's IANA timezone string (e.g. America/Chicago)</li>
+                    <li>Assume user-provided timestamps are in the user's local time unless an offset or timezone is provided</li>
+                    <li>For routine templates, store local time-of-day, timezone, and iCalendar recurrence rules to preserve the intended schedule</li>
+                    <li>For created instances (sessions) and any other non-recurring entities, we can use the simpler method of storing UTC datetimes</li>
+                </ul>
+                <p>This preserves the semantic meaning of recurring events while keeping other entities simpler to query. The tradeoff is more complex and non-uniform timezone handling, and implementation is still stabilizing from the change, but this method more accurately models recurring events at the cost of that complexity.</p>
+            </div>
+
+            <div class="service-card">
+                <h3>Testing</h3>
+                <p>Coming from a QA background where selenium was my first taste of test automation, I naturally gravitated towards end-to-end testing. In retrospect, that produced an inverted testing pyramid.</p>
+                <p>The application has a glut of end-to-end tests which are fairly brittle; I've had to change or disable some tests in order to pass builds as pieces of the frontend or API was refactored because of this inverted testing pyramid.</p>
+                <p>Additionally, the <code>UserOwnedRepository</code> is intended to enforce ownership of user data by overwriting the base repository's CRUD methods and requiring the authenticated user's ID and limiting queries to entities owned by the same user. However, I discovered during this architectural review that <code>UserOwnedRepository</code> only overwrites the getter functions, leaving <code>update</code> and <code>delete</code> exposed. The issue went unnoticed because route handlers perform authorization by calling <code>get()</code> before <code>update()</code> or <code>delete()</code>, causing all end-to-end security tests to pass. While the application's behavior is currently correct, the authorization guarantee exists only as a convention in the route layer rather than as a property of the repository abstraction. Unit tests in the repo layer would have immediately found this issue.</p>
+                <p>If I rebuilt the project today, I would push the majority of testing into unit tests for the repo and service layers, reserve integration testing for cross-entity behaviors based on how frequently I expected them to occur for the user or change in the app, and build a select few end-to-end tests to validate the most ironed-out, frequent, critical, and unchanging application behaviors.</p>
+                <p>The Selenium framework, custom API client, Jenkins integration, and Allure reporting still remain useful foundations. Future work will focus on shifting the bulk of testing toward unit and integration tests while preserving a smaller set of end-to-end tests for critical user workflows.</p>
+            </div>
+
+            <div class="service-card">
+                <h3>Repository Drift</h3>
+                <p>Some repositories include functions that have drifted away from simple getters and convenience methods and actually contain business logic.</p>
+                <p>Even though it's a solo project, a lightweight review checklist for PRs could prevent this problem by inviting investigation into whether any additions to a given module match its purpose (eg if we're modifying a repository, is any added code strictly related to persistence logic?).</p>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <h2>Security</h2>
+            <p>The API is the application's trust boundary.</p>
+            <p>All requests accessing or modifying user data require a valid JWT access token; the webapp acts as an ordinary API client and does not bypass API authentication or authorization.</p>
+            <p>User-scoped repositories provide the authorization boundary for user-owned data. <code>UserOwnedRepository</code> accepts the authenticated user's ID and restricts queries to records owned by that user, keeping ownership checks out of individual routes and service functions.</p>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Catchlist Architecture Review</p>
+    </footer>
+</div>
+</body>
+</html>

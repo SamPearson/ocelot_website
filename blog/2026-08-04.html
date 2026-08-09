@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Repository-Level API Security - Ocelot Code Systems Blog</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<article class="blog-post">
+    <header class="blog-header">
+        <h1 class="blog-title">Repository-Level API Security</h1>
+        <p class="post-metadata">
+            <time datetime="2026-08-04">August 4, 2026</time>
+        </p>
+    </header>
+
+    <div class="blog-content">
+        <section class="blog-section">
+            <p>In a backend I built for a webapp, the database has model/service/repo layers. The repository layer was meant to have some built-in security.</p>
+
+            <p>There's a <code>BaseRepository</code> with basic CRUD functions, and then a <code>UserOwnedRepository</code> which overwrites those functions and requires a <code>user_id</code> as a parameter. The idea being that the API layer would require an auth token, extract the user id from it, and the repo/service layers would be restricted from editing anything not owned by the user who made the request.</p>
+        </section>
+
+        <section class="blog-section">
+            <h2>The Problem</h2>
+
+            <p>The <code>UserOwnedRepository</code> only overrides the getter functions. Perhaps I got real clever at some point and decided that if we implement that security for getters and then make the update/delete functions require the <em>entity</em>, then security would effectively be implemented across all functions.</p>
+
+            <p>Or maybe I just got lazy.</p>
+
+            <p>Either way, this convention would hold until I forgot about it while building a new repo function and thought "wow this would be simpler if I just passed in the entity's ID"</p>
+
+            <p>So it needs to be rebuilt. Unfortunately, this is going to change the function signature for most repo functions, which is going to require refactoring the service methods that call them, and in fact the API layer needs to be refactored as well because currently everything is built around the "get first, return 404 if that fails, operate if not" convention.</p>
+        </section>
+
+        <section class="blog-section">
+            <h2>The Plan</h2>
+
+            <p>The rewrites won't be crazy, we just need a lot of them. Routes need to go from looking like this:</p>
+
+            <div class="code-before">
+                <p class="code-label">Before</p>
+                <pre><code class="language-python">@jwt_required()
+def delete_task(task_id):
+    """Delete a task"""
+    user_id = get_jwt_identity()
+    task = task_service.get_task(task_id=task_id, user_id=user_id)
+    if not task:
+        return ('', 404)
+
+    task_service.delete_task(task)
+    return ('', 204)</code></pre>
+            </div>
+
+            <p>To this:</p>
+
+            <div class="code-after">
+                <p class="code-label">After</p>
+                <pre><code class="language-python">@jwt_required()
+def delete_task(task_id):
+    """Delete a task"""
+    user_id = get_jwt_identity()
+
+    try:
+        task_service.delete_task(user_id, task_id)
+        return '', 204
+    except EntityNotFoundError:
+        return '', 404</code></pre>
+            </div>
+
+            <p>We still need that pattern of using a getter to check if the entity exists, and in fact I think we're going to have to use it both at the repo layer and at the service layer.</p>
+
+            <p>The service layer is going to be doing business logic, and it's probably safest to check and see if we need to return a 404 before letting the service layer try to do anything else.</p>
+
+            <h3>Service Layer Changes</h3>
+
+            <p>Here's what we have now:</p>
+
+            <pre><code class="language-python">def delete_task(self, task: Task) -> None:
+    """Delete a task and cascade delete all associated records"""
+
+
+    # Delete all checkins for this task
+    checkin_service = CheckinService(db.session)
+    checkin_service.delete_for_target(
+        user_id=task.user_id,
+        target_type='task',
+        target_id=task.id,
+    )
+
+    # Delete all tag associations for this task
+    from src.database.tags.tag_models import TagAssociation
+    db.session.query(TagAssociation).filter_by(
+        entity_id=task.id,
+        entity_type='task',
+    ).delete()
+
+    # Delete all principle associations for this task
+    from src.database.principles.principle_models import PrincipleAssociation
+    db.session.query(PrincipleAssociation).filter_by(
+        entity_id=task.id,
+        entity_type='task',
+    ).delete()
+
+    # Commit association deletions
+    db.session.commit()
+
+    # Delete the task itself
+    self.repository.delete(task)</code></pre>
+
+            <p>And we'll probably want something more like this:</p>
+
+            <pre><code class="language-python">def delete_task(self, user_id: int, task_id: int) -> None:
+    """Delete a task and cascade delete all associated records"""
+
+    # This will raise EntityNotFoundError if this task doesn't exist or isnt owned by this user,
+    # handle that exception at the api layer
+    task = self.repository.get(user_id, task_id)
+
+
+    # Delete all checkins for this task
+    checkin_service = CheckinService(db.session)
+    checkin_service.delete_for_target(
+        user_id=user_id,
+        target_type='task',
+        target_id=task_id,
+    )
+
+    # Delete all tag associations for this task
+    from src.database.tags.tag_models import TagAssociation
+    db.session.query(TagAssociation).filter_by(
+        entity_id=task_id,
+        entity_type='task',
+    ).delete()
+
+    # Delete all principle associations for this task
+    from src.database.principles.principle_models import PrincipleAssociation
+    db.session.query(PrincipleAssociation).filter_by(
+        entity_id=task_id,
+        entity_type='task',
+    ).delete()
+
+    # Delete the task itself
+    self.repository.delete(user_id, task_id)
+
+    # Commit association deletions
+    db.session.commit()</code></pre>
+
+            <div class="callout">
+                <p><strong>Two things to note before moving on to the repository layer:</strong></p>
+                <ol>
+                    <li>We're fetching the task so that we can know whether or not it's present, and then we're handing the <code>user_id</code> and <code>task_id</code> to the repo's delete function, causing it to be fetched again. Maybe an extra database operation when we clearly have the database session in context and could just delete the task directly, like so: <code>db.session.delete(task)</code>. But we're doing this whole refactor to get out of the habit of "eh we did security already, let's just directly act on it now".</li>
+                    <li>There's a mix of "directly operating on the database" and "handing things off to the repository" going on here, and at the end of the function we use <code>db.session.commit()</code>, but there are commit and rollback calls in the repo. Session functions should probably each be one big try/except block where we either commit or rollback at the end of all operations based on whether we succeeded at everything (I believe this is the <strong>unit of work</strong> pattern). What we have here kind of does this, but not explicitly. In fact the commit call at the end is currently superfluous, the repo's delete function has one, and the checkin service probably calls a repo which also has one. I think it might be better for data integrity purposes for repos to not call for commits, but leave that to the service layer. That way whatever business logic the service layer does is treated as a single write operation that succeeds or fails and is rolled back, instead of a cascading change failing halfway through with no way to fully roll back.</li>
+                </ol>
+            </div>
+
+            <p>Issue 2 is very much its own refactor, though. We'll do that in another branch so as to not muddy this one up, today has enough trouble of its own.</p>
+
+            <h3>Repository Layer Changes</h3>
+
+            <p>On to the repos.</p>
+
+            <p>Currently if nothing is found, the get function just returns something falsy and that's the general contract. We need a stronger more explicit indicator of "entity not found". Our exception will do.</p>
+
+            <p>So for the getter we go from this:</p>
+
+            <pre><code class="language-python">def get(self, id: int, user_id: int) -> Optional[T]:
+    """Retrieve a record by ID and user_id."""
+    try:
+        return self.session.query(self.model_class).filter_by(
+            id=id,
+            user_id=user_id
+        ).first()
+    except Exception as e:
+        raise RepositoryError(f"Error retrieving {self.model_class.__name__}: {str(e)}")</code></pre>
+
+            <p>to this:</p>
+
+            <pre><code class="language-python">def get(self, id: int, user_id: int) -> T:
+    """Retrieve a record by ID and user_id."""
+    try:
+        instance = self.session.query(self.model_class).filter_by(
+            id=id,
+            user_id=user_id
+        ).first()
+
+        if instance is None:
+            raise EntityNotFoundError(
+                f"{self.model_class.__name__} {id} not found"
+            )
+
+        return instance
+
+    except EntityNotFoundError:
+        raise
+    except Exception as e:
+        raise RepositoryError(
+            f"Error retrieving {self.model_class.__name__}: {str(e)}"
+        )</code></pre>
+
+            <p>Now our delete method gets to be this simple:</p>
+
+            <pre><code class="language-python">def delete(self, user_id: int, id: int) -> bool:
+    """Delete a record owned by the user."""
+    instance = self.get(id, user_id)
+    return super().delete(instance)</code></pre>
+
+            <p>With this change in the getter's contract, we now have to comb through all calls to it and make them handle an exception instead of branching off of "if not task". Not a big deal, it's more explicit and that's good. Plus any time that goes unhanlded will be clear, instead of potentially becoming a ghost issue that needs significant RCA.</p>
+
+            <p>And that's it! That's all that needs to be done! For one function, for one database entity.</p>
+
+            <p>This is going to be a big refactor of a system that currently works, but the fact of the matter is that it's brittle, and there's a lot to improve on here. And what's more, the refactor would only get bigger as more code was piled onto the backend.</p>
+        </section>
+    </div>
+
+    <footer class="blog-footer">
+        <p>
+            <a href="../index.html">← Back to Home</a>
+        </p>
+    </footer>
+</article>
+</body>
+</html>

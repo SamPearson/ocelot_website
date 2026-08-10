@@ -1,0 +1,3 @@
+
+# Don't include editor config in the repo
+.idea

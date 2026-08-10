@@ -8,6 +8,18 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a href="../index.html" class="site-brand">Ocelot Code Systems</a>
+      <nav class="site-nav">
+        <a href="../index.html">Home</a>
+        <a href="index.html">Blog</a>
+        <a href="../index.html#services">Services</a>
+        <a href="../index.html#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
 <main class="blog-index">
     <header class="blog-index-header">
         <h1>The Dev Blog</h1>
@@ -47,7 +59,30 @@
                 </div>
             </article>
 
-<!--            &lt;!&ndash; Article 2 &ndash;&gt;-->
+            <!-- Article 2 -->
+            <article class="article-item" data-expanded="false">
+                <header class="item-header" data-toggle="article">
+                    <div class="header-content">
+                        <h3><a href="2026-07-27.html">Catchlist Architecture Review</a></h3>
+                        <time datetime="2026-07-27">July 27, 2026</time>
+                    </div>
+                    <span class="toggle-indicator"></span>
+                </header>
+                <div class="preview-content">
+                    <p>Catchlist is a productivity application for managing tasks, projects, routines, and commitments — but it's primarily an exercise in building a small app with commercial-grade infrastructure: a frontend/backend split, dev/staging/production environments, CI/CD, automated testing, and an architecture where every behavior has an obvious home.</p>
+                    <p>The writeup walks through the full system structure, driven by a single guiding principle: entities flow through a consistent pattern of model, repository, service, presenter, API routes, and webapp routes, keeping responsibilities clear at every layer.</p>
+
+                    <h4>Tradeoffs</h4>
+                    <p>Splitting API and webapp into two services adds deployment complexity, but enforces a clean separation between presentation and backend logic. Timezone and recurring event handling go beyond the usual "store in UTC" advice to preserve intent across DST changes. And explicitness is deliberately favored over minimalism — even when it means more files — because complex is better than complicated.</p>
+
+                    <h4>Lessons Learned</h4>
+                    <p>The review covers modeling recurring events without losing their meaning, the pain of an inverted testing pyramid (a glut of brittle end-to-end tests), and how repository layers can silently drift into containing business logic.</p>
+                    <p>...</p>
+                    <h3><a href="2026-07-27.html">View Post</a></h3>
+                </div>
+            </article>
+
+<!--            &lt;!&ndash; Article 3 &ndash;&gt;-->
 <!--            <article class="article-item" data-expanded="false">-->
 <!--                <header class="item-header" data-toggle="article">-->
 <!--                    <div class="header-content">-->
@@ -71,7 +106,7 @@
 <!--                </div>-->
 <!--            </article>-->
 
-<!--            &lt;!&ndash; Article 3 &ndash;&gt;-->
+<!--            &lt;!&ndash; Article 4 &ndash;&gt;-->
 <!--            <article class="article-item" data-expanded="false">-->
 <!--                <header class="item-header" data-toggle="article">-->
 <!--                    <div class="header-content">-->
@@ -95,7 +130,7 @@
 <!--                </div>-->
 <!--            </article>-->
 
-<!--            &lt;!&ndash; Article 4 &ndash;&gt;-->
+<!--            &lt;!&ndash; Article 5 &ndash;&gt;-->
 <!--            <article class="article-item" data-expanded="false">-->
 <!--                <header class="item-header" data-toggle="article">-->
 <!--                    <div class="header-content">-->
@@ -119,7 +154,7 @@
 <!--                </div>-->
 <!--            </article>-->
 
-<!--            &lt;!&ndash; Article 5 &ndash;&gt;-->
+<!--            &lt;!&ndash; Article 6 &ndash;&gt;-->
 <!--            <article class="article-item" data-expanded="false">-->
 <!--                <header class="item-header" data-toggle="article">-->
 <!--                    <div class="header-content">-->
@@ -143,7 +178,7 @@
 <!--                </div>-->
 <!--            </article>-->
 
-<!--            &lt;!&ndash; Article 6 &ndash;&gt;-->
+<!--            &lt;!&ndash; Article 7 &ndash;&gt;-->
 <!--            <article class="article-item" data-expanded="false">-->
 <!--                <header class="item-header" data-toggle="article">-->
 <!--                    <div class="header-content">-->
@@ -167,7 +202,7 @@
 <!--                </div>-->
 <!--            </article>-->
 
-<!--            &lt;!&ndash; Article 7 &ndash;&gt;-->
+<!--            &lt;!&ndash; Article 8 &ndash;&gt;-->
 <!--            <article class="article-item" data-expanded="false">-->
 <!--                <header class="item-header" data-toggle="article">-->
 <!--                    <div class="header-content">-->
@@ -191,7 +226,7 @@
 <!--                </div>-->
 <!--            </article>-->
 
-<!--            &lt;!&ndash; Article 8 &ndash;&gt;-->
+<!--            &lt;!&ndash; Article 9 &ndash;&gt;-->
 <!--            <article class="article-item" data-expanded="false">-->
 <!--                <header class="item-header" data-toggle="article">-->
 <!--                    <div class="header-content">-->
@@ -217,13 +252,11 @@
 
         </div>
     </section>
-
-    <footer class="blog-index-footer">
-        <p>
-            <a href="../index.html">← Back to Home</a>
-        </p>
-    </footer>
 </main>
+
+<footer class="site-footer">
+    <p>&copy; 2026 Ocelot Code Systems. Built with intention, tested to prove.</p>
+</footer>
 
 <script>
     // Toggle article expansion

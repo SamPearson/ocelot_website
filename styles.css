@@ -1,28 +1,66 @@
-/* Ocelot Code Systems - Business Card Website Styles */
-/* Clean, elegant, professional design */
+/* ============================================
+   Ocelot Code Systems - Design Language
+   "The Engineer's Notebook"
+   Technical and precise, but handcrafted.
+   ============================================ */
 
-/* Reset & Base */
+/* ----------------------------------------------------------
+   Design Tokens
+   ---------------------------------------------------------- */
+:root {
+  /* Paper & ink (light theme default) */
+  --bg: #fbfaf6;            /* paper */
+  --bg-soft: #f6f2e3;       /* legal pad */
+  --bg-soft-2: #f0ead3;     /* hover / deeper surface */
+  --ink: #2b2a26;           /* body text */
+  --ink-soft: #5f5c53;      /* secondary text */
+
+  /* Brand */
+  --navy: #1a3a5f;          /* headings, brand */
+  --teal: #2d5a87;          /* accent */
+  --teal-hover: #3f6d9c;    /* accent hover */
+
+  /* Chrome */
+  --line: #e0d9c2;          /* hairlines & borders */
+
+  /* Type */
+  --serif: Georgia, 'Times New Roman', serif;
+  --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Layout */
+  --width: 900px;
+  --radius: 4px;
+
+  /* Spacing */
+  --s1: 0.5rem;
+  --s2: 1rem;
+  --s3: 2rem;
+  --s4: 3rem;
+  --s5: 4rem;
+}
+
+/* Dark theme - follows the browser setting */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #141b26;
+    --bg-soft: #1c2634;
+    --bg-soft-2: #263448;
+    --ink: #e9e5d6;
+    --ink-soft: #a7a191;
+    --navy: #e9e5d6;
+    --teal: #6fa3c4;
+    --teal-hover: #8ab8d4;
+    --line: #2f3a4d;
+  }
+}
+
+/* ----------------------------------------------------------
+   Reset & Base
+   ---------------------------------------------------------- */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-}
-
-:root {
-  --primary-color: #1a3a5f; /* Deep navy/teal */
-  --accent-color: #2d5a87;
-  --text-primary: #2c2c2c;
-  --text-secondary: #555555;
-  --bg-primary: #ffffff;
-  --bg-secondary: #f8f9fa;
-  --spacing-xs: 0.5rem;
-  --spacing-sm: 1rem;
-  --spacing-md: 2rem;
-  --spacing-lg: 3rem;
-  --spacing-xl: 4rem;
-  --border-radius: 4px;
-  --font-family: 'Georgia', 'Times New Roman', serif;
-  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 html {
@@ -31,191 +69,257 @@ html {
 }
 
 body {
-  font-family: var(--font-sans);
-  color: var(--text-primary);
-  background-color: var(--bg-primary);
+  font-family: var(--sans);
+  color: var(--ink);
+  background-color: var(--bg);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Container */
-.container {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: var(--spacing-lg) var(--spacing-md);
-}
-
-/* Typography */
+/* ----------------------------------------------------------
+   Typography
+   ---------------------------------------------------------- */
 h1, h2, h3, h4 {
   font-weight: 600;
   line-height: 1.3;
-  color: var(--primary-color);
+  color: var(--navy);
 }
 
-h1 { font-size: 2rem; }
-h2 { font-size: 1.5rem; margin-top: 1.5rem; }
-h3 { font-size: 1.25rem; margin-top: 1rem; }
-h4 { font-size: 1rem; margin-top: 0.75rem; }
+h1 { font-family: var(--serif); font-size: 2.5rem; }
+h2 { font-family: var(--serif); font-size: 1.6rem; margin-top: var(--s4); margin-bottom: var(--s2); }
+h3 { font-size: 1.2rem; margin-top: var(--s3); margin-bottom: var(--s1); }
+h4 { font-size: 1rem; margin-top: var(--s2); margin-bottom: var(--s1); }
 
 p {
-  margin-bottom: var(--spacing-sm);
+  margin-bottom: var(--s2);
 }
 
-/* Header */
+a {
+  color: var(--teal);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+a:hover {
+  color: var(--teal-hover);
+  text-decoration: underline;
+}
+
+/* Keep anchored sections clear of the sticky header */
+section[id],
+#contact {
+  scroll-margin-top: 80px;
+}
+
+/* ----------------------------------------------------------
+   Shared Chrome - Site Header
+   ---------------------------------------------------------- */
+.site-header {
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.site-header-inner {
+  max-width: var(--width);
+  margin: 0 auto;
+  padding: var(--s2) var(--s3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s2);
+}
+
+.site-brand {
+  font-family: var(--serif);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+.site-brand:hover {
+  color: var(--navy);
+  text-decoration: none;
+}
+
+.site-nav {
+  display: flex;
+  gap: var(--s3);
+}
+
+.site-nav a {
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+}
+
+.site-nav a:hover {
+  color: var(--teal);
+  text-decoration: none;
+}
+
+/* ----------------------------------------------------------
+   Layout Containers
+   ---------------------------------------------------------- */
+.container {
+  max-width: var(--width);
+  margin: 0 auto;
+  padding: var(--s4) var(--s3) var(--s5);
+}
+
+/* ----------------------------------------------------------
+   Page Headers & Heroes
+   ---------------------------------------------------------- */
 .main-header {
   text-align: center;
-  margin-bottom: var(--spacing-xl);
-  padding-bottom: var(--spacing-md);
-  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: var(--s4);
+  padding-bottom: var(--s3);
+  border-bottom: 1px solid var(--line);
 }
 
 .company-name {
-  font-family: var(--font-family);
-  font-size: 2.5rem;
+  font-family: var(--serif);
+  font-size: 3rem;
   font-weight: 700;
-  color: var(--primary-color);
-  margin-bottom: var(--spacing-xs);
+  color: var(--navy);
+  margin-bottom: var(--s1);
 }
 
 .page-title {
-  font-family: var(--font-family);
+  font-family: var(--serif);
   font-size: 2.5rem;
   font-weight: 700;
-  color: var(--primary-color);
-  margin-bottom: var(--spacing-xs);
+  color: var(--navy);
+  margin-bottom: var(--s1);
 }
 
 .tagline {
   font-style: italic;
-  color: var(--text-secondary);
-  font-size: 1.1rem;
-  margin: var(--spacing-xs) 0;
+  color: var(--ink-soft);
+  font-size: 1.15rem;
+  margin: var(--s1) 0;
 }
 
 .subtitle {
   font-size: 0.95rem;
-  color: var(--text-secondary);
-  margin-top: var(--spacing-xs);
+  color: var(--ink-soft);
+  margin-top: var(--s1);
 }
 
-/* Content Sections */
+/* ----------------------------------------------------------
+   Content Sections
+   ---------------------------------------------------------- */
 .content-section {
-  margin-bottom: var(--spacing-xl);
+  margin-bottom: var(--s5);
 }
 
-/* Service Cards */
+/* ----------------------------------------------------------
+   Cards (projects, services, tradeoffs)
+   ---------------------------------------------------------- */
 .service-card,
 .project-card {
-  background: var(--bg-secondary);
-  padding: var(--spacing-md);
-  border-radius: var(--border-radius);
-  margin-bottom: var(--spacing-md);
-  border-left: 3px solid var(--accent-color);
+  background: var(--bg-soft);
+  padding: var(--s3);
+  border-radius: var(--radius);
+  margin-bottom: var(--s3);
+  border-left: 3px solid var(--teal);
 }
 
 .service-card h3,
 .project-card h3 {
-  margin-bottom: var(--spacing-sm);
+  margin-bottom: var(--s2);
+  color: var(--navy);
+}
+
+.service-card h4,
+.project-card h4 {
+  margin: var(--s2) 0 var(--s1);
+  color: var(--navy);
 }
 
 /* Services List */
 .services-list {
   list-style: none;
   padding-left: 0;
+  margin-bottom: var(--s2);
 }
 
 .services-list li {
-  padding: var(--spacing-xs) 0;
-  padding-left: var(--spacing-sm);
+  padding: var(--s1) 0;
+  padding-left: var(--s2);
   position: relative;
 }
 
 .services-list li::before {
-  content: "•";
-  color: var(--accent-color);
+  content: "\2022";
+  color: var(--teal);
   position: absolute;
   left: 0;
   font-weight: bold;
 }
 
-/* Links */
-a {
-  color: var(--primary-color);
-  text-decoration: none;
-  transition: color 0.2s;
+/* ----------------------------------------------------------
+   Case Study Grid (legacy section pages)
+   ---------------------------------------------------------- */
+.case-study-grid {
+  display: grid;
+  gap: var(--s3);
 }
 
-a:hover {
-  color: var(--accent-color);
-  text-decoration: underline;
+.case-study-card {
+  display: block;
+  background: var(--bg-soft);
+  padding: var(--s3);
+  border-radius: var(--radius);
+  border-left: 3px solid var(--teal);
 }
 
-/* Contact Section */
-#contact {
-  margin-top: var(--spacing-xl);
-  text-align: center;
-  background: var(--bg-secondary);
-  padding: var(--spacing-md);
-  border-radius: var(--border-radius);
+.case-study-card h3 {
+  margin-bottom: var(--s1);
+  color: var(--navy);
 }
 
-#contact p {
-  margin-bottom: var(--spacing-sm);
+.case-study-description {
+  color: var(--ink);
 }
 
-footer {
-  margin-top: var(--spacing-xl);
-  text-align: center;
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  padding-top: var(--spacing-md);
-  border-top: 1px solid #e0e0e0;
+.case-study-meta {
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  margin-top: var(--s2);
 }
 
-/* Mobile Responsive */
-@media screen and (max-width: 600px) {
-  .container {
-    padding: var(--spacing-md) var(--spacing-sm);
-  }
-
-  .company-name {
-    font-size: 2rem;
-  }
-
-  h2 {
-    font-size: 1.3rem;
-  }
-}
-
-
-/* Architecture/Detail Pages */
+/* ----------------------------------------------------------
+   Architecture Detail Pages (legacy)
+   ---------------------------------------------------------- */
 .architecture-page h2 {
-  margin-top: 2rem;
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid var(--accent-color);
+  margin-top: var(--s3);
+  margin-bottom: var(--s2);
+  padding-bottom: var(--s1);
+  border-bottom: 2px solid var(--line);
 }
 
 .architecture-page code {
-  background: var(--bg-secondary);
+  background: var(--bg-soft);
   padding: 0.1rem 0.3rem;
   border-radius: 3px;
   font-size: 0.9em;
 }
 
 .code-snippet {
-  background: var(--bg-secondary);
-  padding: 1rem;
-  border-left: 3px solid var(--accent-color);
-  margin: 1rem 0;
+  background: var(--bg-soft);
+  padding: var(--s2);
+  border-left: 3px solid var(--teal);
+  margin: var(--s2) 0;
   overflow-x: auto;
 }
 
 .entity-pattern {
-  background: var(--bg-secondary);
-  padding: 1.5rem;
-  border-radius: 5px;
-  margin: 1rem 0;
+  background: var(--bg-soft);
+  padding: var(--s3);
+  border-radius: var(--radius);
+  margin: var(--s2) 0;
 }
 
 .entity-pattern ul {
@@ -225,9 +329,88 @@ footer {
 
 .entity-pattern li {
   padding: 0.3rem 0;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--line);
 }
 
 .entity-pattern li:last-child {
   border-bottom: none;
+}
+
+/* ----------------------------------------------------------
+   Contact
+   ---------------------------------------------------------- */
+#contact {
+  margin-top: var(--s5);
+  text-align: center;
+  background: var(--bg-soft);
+  padding: var(--s3);
+  border-radius: var(--radius);
+}
+
+#contact p {
+  margin-bottom: var(--s2);
+}
+
+#contact a {
+  color: var(--teal);
+}
+
+/* ----------------------------------------------------------
+   Shared Chrome - Site Footer
+   ---------------------------------------------------------- */
+.site-footer {
+  border-top: 1px solid var(--line);
+  margin-top: var(--s5);
+  padding: var(--s3) var(--s2);
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+
+/* Legacy generic footer (detail pages) */
+footer {
+  margin-top: var(--s5);
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  padding-top: var(--s3);
+  border-top: 1px solid var(--line);
+}
+
+/* ----------------------------------------------------------
+   Mobile Responsive
+   ---------------------------------------------------------- */
+@media screen and (max-width: 600px) {
+  .container {
+    padding: var(--s3) var(--s2) var(--s4);
+  }
+
+  .site-header-inner {
+    padding: var(--s2) var(--s2);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--s1);
+  }
+
+  .site-nav {
+    gap: var(--s2);
+  }
+
+  .company-name {
+    font-size: 2.2rem;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  h2 {
+    font-size: 1.4rem;
+  }
+
+  .service-card,
+  .project-card,
+  .case-study-card {
+    padding: var(--s2);
+  }
 }

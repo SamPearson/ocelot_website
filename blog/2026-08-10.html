@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playwright Day 1 - Hello World - Ocelot Code Systems Blog</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="site-header">
+    <div class="site-header-inner">
+        <a href="../index.html" class="site-brand">Ocelot Code Systems</a>
+        <nav class="site-nav">
+            <a href="../index.html">Home</a>
+            <a href="index.html">Blog</a>
+            <a href="../index.html#services">Services</a>
+            <a href="../index.html#contact">Contact</a>
+        </nav>
+    </div>
+</header>
+
+<article class="blog-post">
+    <header class="blog-header">
+        <h1 class="blog-title">Playwright Day 1 - Hello World</h1>
+        <p class="post-metadata">
+            <time datetime="2026-08-10">August 10, 2026</time>
+        </p>
+    </header>
+
+    <div class="blog-content">
+        <section class="blog-section">
+            <p>Here we go.</p>
+        </section>
+
+        <section class="blog-section">
+            <h2>Installation & Test 1 - the built-in test</h2>
+
+            <p>Install it with:</p>
+            <pre><code class="language-bash">npm install playwright</code></pre>
+
+            <p>Initialize projects with:</p>
+            <pre><code class="language-bash">npm init playwright@latest</code></pre>
+
+            <p>Then update:</p>
+            <pre><code class="language-bash">npm install -D @playwright/test@latest
+npx playwright install --with-deps</code></pre>
+
+            <p>They provide an example test you can run:</p>
+            <pre><code class="language-bash">npx playwright test</code></pre>
+
+            <p>And after doing so you can look at a nice HTML report:</p>
+            <pre><code class="language-bash">npx playwright show-report</code></pre>
+
+            <p>Clean looking test, the syntax is practically human readable with the exception of the <code>GetByRole</code> function, which is clear enough.</p>
+
+            <p>Counting this as 1/100 tests in the bag lol</p>
+        </section>
+    </div>
+</article>
+
+<footer class="site-footer">
+    <p>&copy; 2026 Ocelot Code Systems. Built with intention, tested to prove.</p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playwright Day 4 - Grouping Tests & Troubleshooting IO - Ocelot Code Systems Blog</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="site-header">
+    <div class="site-header-inner">
+        <a href="../index.html" class="site-brand">Ocelot Code Systems</a>
+        <nav class="site-nav">
+            <a href="../index.html">Home</a>
+            <a href="index.html">Blog</a>
+            <a href="../index.html#services">Services</a>
+            <a href="../index.html#contact">Contact</a>
+        </nav>
+    </div>
+</header>
+
+<article class="blog-post">
+    <header class="blog-header">
+        <h1 class="blog-title">Playwright Day 4 - Grouping Tests & Troubleshooting IO</h1>
+        <p class="post-metadata">
+            <time datetime="2026-08-14">August 14, 2026</time>
+        </p>
+    </header>
+
+    <div class="blog-content">
+        <section class="blog-section">
+            <p>Day 3 was about learning the different ways that tests can be grouped and selected for running. This provides a good opportunity to memorize syntax by typing out a glut of tests.</p>
+
+            <p>This test:</p>
+
+            <pre><code class="language-typescript">test( 'test 001', {tag: '@tag_one'} async({page}) => {
+    // Navigate
+    await page.goto('https://playwright.dev/')
+
+    // Interact
+    await page.getByRole('link', {name: 'get started'}).click()
+
+    // Read and Assert
+    await expect(page.getByRole('heading', {name: 'Installation'})).toBeVisible()
+
+})</code></pre>
+
+            <p>It's almost literally the example test provided when you run</p>
+            <pre><code class="language-bash">npm install playwright@latest</code></pre>
+
+            <p>But it does a good job of modeling what a test is.</p>
+
+            <p>I wrote out 18 of these tests, split up between different 3 folders, 2 different files per folder, 3 tests per file.</p>
+
+            <p>I handwrote them to build muscle memory for the syntax, and in the end 3 of these tests failed. Likely due to typos but I immediately thought "oh here's a case for me to use the interactive run features to isolate the issue" which in turn got me thinking about a chaos script, like the chaos monkey tool that Netflix uses, to intentionally fudge some tests so that I would have to use the interactive tools to hunt down the failures.</p>
+
+            <p>Neat stuff, for another day.</p>
+        </section>
+
+        <section class="blog-section">
+            <h2>Investigating Test Failures</h2>
+
+            <p>At a glance everything was going great. I ran the tests in UI mode, immediately identified that I had missed a <code>.click()</code> on one of the tests, fixed it, ran it again.</p>
+
+            <p>But these tests are feeling super flaky. One of the tests fails on Firefox like 10-20% of the time; and it's failing on the navigation step.</p>
+
+            <p>I shouldn't be getting 30 second timeout failures on "go to this page"</p>
+
+            <pre><code>Running 84 tests using 4 workers
+
+1. [firefox] › tests/blue_tests/group_giraffe.spec.ts:14:5 › triangle @one ───────────────────────
+  Test timeout of 30000ms exceeded.
+  Error: page.goto: Test timeout of 30000ms exceeded.
+  Call log:
+
+- navigating to "https://playwright.dev/", waiting until "load"</code></pre>
+
+            <p>I thought maybe too many tests were running at once, so I isolated to just one test and ran it 10x:</p>
+
+            <pre><code class="language-bash">npx playwright test tests/red_tests/group_wolf.spec.ts -g "triangle" --project=firefox --repeat-each=10</code></pre>
+
+            <p>But the issue kept occasionally appearing.</p>
+
+            <p>I tried replicating the issue in Chromium, but no dice. It appears to be a Firefox-only issue.</p>
+
+            <p>After a bit of searching I found a <a href="https://github.com/microsoft/playwright/issues/42183">bug report with vaguely the same issue</a>, but with a vastly lower repro rate. I'm getting more like 10-20%.</p>
+
+            <p>Still, there was a fix pushed for it, and it's recent, so it's worth updating Playwright to see if that's the issue.</p>
+
+            <p>Prankd, I'm already using the current version: <code>Version 1.62.1</code></p>
+
+            <p>It seemed like this would be a good place to use trace and the HTML reports, but unfortunately they didn't show anything more than the test timing out on either the page fixture or the <code>page.goto</code> step.</p>
+
+            <p>I was able to get a bit more success by changing the wait target for the <code>page.goto</code> statement, like so:</p>
+
+            <pre><code class="language-typescript">await page.goto('https://playwright.dev', {waitUntil: 'domcontentloaded' })</code></pre>
+
+            <p>But at this point I started to get obstinate.</p>
+
+            <p>This is the default, built-in, stock standard test. We're just going to a page and clicking one thing, verifying a heading is present. Not a particularly complex page either, mostly just HTML, not a bunch of crazy JavaScript running. The page loads instantly when viewing it in a normal browser.</p>
+
+            <p>This shouldn't be getting a 20-30% failure rate, you shouldn't have to adjust the baseline example test out of the box for alternate wait targets or wait times to get it to pass consistently.</p>
+
+            <p>So I had to investigate further.</p>
+        </section>
+
+        <section class="blog-section">
+            <h2>Resource Investigation</h2>
+
+            <p>I started suspecting resource constraints, so I limited the test to one simultaneous worker, like so:</p>
+
+            <pre><code class="language-bash">$ npx playwright test tests/blue_tests/group_giraffe.spec.ts -g "triangle" --project=firefox --repeat-each=10 --workers=1</code></pre>
+
+            <p>That didn't fix the issue, so I ran it in headed mode to see if something new would show up:</p>
+
+            <pre><code class="language-bash">$ npx playwright test tests/blue_tests/group_giraffe.spec.ts -g "triangle" --project=firefox --repeat-each=10 --workers=1 --headed</code></pre>
+
+            <p>Nothing new, but I was able to visually confirm that the browser was opening and taking forever to resolve https://playwright.dev and actually load the page, so it was hitting the 30 second timeout honestly. At that point the resource constraint suspicion started sounding pretty valid.</p>
+
+            <p>I started running <code>ps aux</code> and <code>top</code> to get resource information, and saw this from top:</p>
+
+            <pre><code>top - 06:37:16 up 3 days, 22:31, 2 users, load average: 15.26, 11.49, 7.29
+Tasks: 474 total, 2 running, 471 sleeping, 0 stopped, 1 zombie
+%Cpu(s): 14.1 us, 3.1 sy, 0.0 ni, 9.8 id, 73.1 wa, 0.0 hi, 0.0 si, 0.0 st
+MiB Mem : 32060.9 total, 2595.4 free, 21411.8 used, 9116.5 buff/cache
+MiB Swap: 2048.0 total, 301.8 free, 1746.2 used. 10649.1 avail Mem</code></pre>
+
+            <p>Particularly this:</p>
+
+            <p><code>73.1 wa</code></p>
+
+            <p>Another snapshot had this:</p>
+
+            <p><code>77.6 wa</code></p>
+
+            <p>These are absurdly high IO wait times, so the suspicion narrows from "resource constraint" to specifically IO wait.</p>
+
+            <p>From here I used <code>iotop</code> to see what was writing to the disk:</p>
+
+            <pre><code>Total DISK READ: 0.00 B/s | Total DISK WRITE: 127.81 K/s
+Current DISK READ: 0.00 B/s | Current DISK WRITE: 105.26 K/s
+TID PRIO USER DISK READ DISK WRITE> COMMAND
+6459 be/4 user 0.00 B/s 45.11 K/s brave --type=utility --utility-sub-typ~d=3190708993808206286 [ThreadPoolForeg]
+749234 be/4 root 0.00 B/s 25.06 K/s [kworker/u16:3-flush-ecryptfs-1]
+7710 be/4 user 0.00 B/s 20.05 K/s firefox [sqldb:c~lite #7]</code></pre>
+
+            <p>It's interesting that somehow the Brave browser uses a lot of disk even when idle, but the ecryptfs is more telling. And <code>top</code>/<code>vmstat</code> showing really high IO wait times point at home directory encryption as the issue.</p>
+
+            <p>I'm running a Linux OS, and with those you often get a "do you want to encrypt your home directory" prompt during the installation procedure. If you do that, then every disk write comes with the additional overhead from encryption.</p>
+
+            <p>So there's our culprit. There's the additional IO wait time.</p>
+
+            <p>Unclear why it only affects Firefox, but Firefox could just be configured to do more IO writes than other browsers. In any case, the solution here is to move the Playwright project directory out of the encrypted drive.</p>
+
+            <p>To test this, I copied the directory into <code>/tmp</code> (which is outside the encrypted home directory), set the browser path variable, and reinstalled the Playwright browsers:</p>
+
+            <pre><code class="language-bash">$ cp -a ~/Code/playwright_training /tmp/playwright_training
+$ export PLAYWRIGHT_BROWSERS_PATH=/tmp/ms-playwright
+$ npx playwright install</code></pre>
+
+            <p>After this, I'm getting phenomenally better test pass rates. In multiple runs with 1 or 4 simultaneous workers, 1 out of 70 tests failed. IO wait sometimes creeps up to 30% but tests run in 5-10 seconds and pass consistently, so I'm willing to call this solved and chalk the remaining IO wait up to the fact that I'm running these tests from a slow platter drive instead of an SSD; which I imagine would make it nearly impossible to hit the 30 second timeout for a simple test like "go to site, click link, check for heading".</p>
+        </section>
+    </div>
+</article>
+
+<footer class="site-footer">
+    <p>&copy; 2026 Ocelot Code Systems. Built with intention, tested to prove.</p>
+</footer>
+</body>
+</html>

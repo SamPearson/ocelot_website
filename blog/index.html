@@ -37,6 +37,100 @@
             <article class="article-item" data-expanded="false">
                 <header class="item-header" data-toggle="article">
                     <div class="header-content">
+                        <h3><a href="2026-08-14.html">Playwright Day 4 - Grouping Tests & Troubleshooting IO</a></h3>
+                        <time datetime="2026-08-14">August 14, 2026</time>
+                    </div>
+                    <span class="toggle-indicator"></span>
+                </header>
+                <div class="preview-content">
+                    <p>Day 3 was about learning the different ways that tests can be grouped and selected for running. This provides a good opportunity to memorize syntax by typing out a glut of tests.</p>
+
+                    <h4>Investigating Test Failures</h4>
+                    <p>At a glance everything was going great. I ran the tests in UI mode, immediately identified that I had missed a <code>.click()</code> on one of the tests, fixed it, ran it again.</p>
+
+                    <p>But these tests are feeling super flaky. One of the tests fails on Firefox like 10-20% of the time; and it's failing on the navigation step. I shouldn't be getting 30 second timeout failures on "go to this page".</p>
+
+                    <h4>Resource Investigation</h4>
+                    <p>I started suspecting resource constraints, but after investigation discovered the real culprit: home directory encryption was causing excessive IO wait times. Moving the project directory to <code>/tmp</code> resolved the issue almost entirely.</p>
+
+                    <p>...</p>
+                    <h3><a href="2026-08-14.html">View Post</a></h3>
+                </div>
+            </article>
+
+            <!-- Article 2 -->
+            <article class="article-item" data-expanded="false">
+                <header class="item-header" data-toggle="article">
+                    <div class="header-content">
+                        <h3><a href="2026-08-13.html">Playwright Day 3 - Integrations</a></h3>
+                        <time datetime="2026-08-13">August 13, 2026</time>
+                    </div>
+                    <span class="toggle-indicator"></span>
+                </header>
+                <div class="preview-content">
+                    <p>The last remaining particles in Playwright's "Getting Started" section are running and debugging, trace viewer, CI integration, and VS Code integration.</p>
+
+                    <h4>Running and Debugging</h4>
+                    <p>Running is very simple with <code>npx playwright test</code>. Playwright can also run tests in a "ui" mode which allows you to easily walk through each step of the test and visually see what was happening before, during and after each step.</p>
+
+                    <h4>Test Grouping and Tagging</h4>
+                    <p>Specific tests or groups of tests can be run in various ways, including through a tag system that acts as the counterpart for pytest markers. You can grep for tags when running and even use logical operators to get complex with how you decide what to run.</p>
+
+                    <p>...</p>
+                    <h3><a href="2026-08-13.html">View Post</a></h3>
+                </div>
+            </article>
+
+            <!-- Article 3 -->
+            <article class="article-item" data-expanded="false">
+                <header class="item-header" data-toggle="article">
+                    <div class="header-content">
+                        <h3><a href="2026-08-11.html">Playwright Day 2: Test Writing Basics</a></h3>
+                        <time datetime="2026-08-11">August 11, 2026</time>
+                    </div>
+                    <span class="toggle-indicator"></span>
+                </header>
+                <div class="preview-content">
+                    <p>Turns out the <code>GetByRole</code> function seen in example tests is part of a whole API of element-getters including <code>getByText</code>, <code>getByLabel</code>, <code>getByPlaceholder</code>, <code>getByAltText</code>, <code>getByTitle</code>, and <code>getByTestId</code>.</p>
+
+                    <h4>Locators</h4>
+                    <p>The locators API is quite flexible and chainable, allowing you to narrow searches. However, the recommended approach of using role locators to identify elements the way users do has some tradeoffs when it comes to brittle tests if text changes.</p>
+
+                    <h4>Actions and Assertions</h4>
+                    <p>There are convenient functions for interacting with elements like <code>click()</code>, <code>fill()</code>, <code>check()</code>, and assertion methods like <code>toBeVisible()</code>, <code>toHaveText()</code>, and <code>toHaveValue()</code> that keep the framework reading like plain English.</p>
+
+                    <p>...</p>
+                    <h3><a href="2026-08-11.html">View Post</a></h3>
+                </div>
+            </article>
+
+            <!-- Article 4 -->
+            <article class="article-item" data-expanded="false">
+                <header class="item-header" data-toggle="article">
+                    <div class="header-content">
+                        <h3><a href="2026-08-10.html">Playwright Day 1 - Hello World</a></h3>
+                        <time datetime="2026-08-10">August 10, 2026</time>
+                    </div>
+                    <span class="toggle-indicator"></span>
+                </header>
+                <div class="preview-content">
+                    <p>Here we go.</p>
+
+                    <h4>Installation & Test 1 - the built-in test</h4>
+                    <p>Install Playwright with <code>npm install playwright</code> and initialize projects with <code>npm init playwright@latest</code>. Then update dependencies and you can run the example test they provide.</p>
+
+                    <p>They provide a clean looking example test with syntax that is practically human readable, with the possible exception of the <code>GetByRole</code> function which is clear enough once you understand it.</p>
+
+                    <p>Counting this as 1/100 tests in the bag lol</p>
+                    <p>...</p>
+                    <h3><a href="2026-08-10.html">View Post</a></h3>
+                </div>
+            </article>
+
+            <!-- Article 5 -->
+            <article class="article-item" data-expanded="false">
+                <header class="item-header" data-toggle="article">
+                    <div class="header-content">
                         <h3><a href="2026-08-04.html">Repository-Level API Security</a></h3>
                         <time datetime="2026-08-04">August 4, 2026</time>
                     </div>
@@ -47,19 +141,15 @@
                     <p>There's a <code>BaseRepository</code> with basic CRUD functions, and then a <code>UserOwnedRepository</code> which overwrites those functions and requires a <code>user_id</code> as a parameter. The idea being that the API layer would require an auth token, extract the user id from it, and the repo/service layers would be restricted from editing anything not owned by the user who made the request.</p>
 
                     <h4>The Problem</h4>
-                    <p>The <code>UserOwnedRepository</code> only overrides the getter functions. Perhaps I got real clever at some point and decided that if we implement that security for getters and then make the update/delete functions require the <em>entity</em>, then security would effectively be implemented across all functions.</p>
-                    <p>Or maybe I just got lazy.</p>
+                    <p>The <code>UserOwnedRepository</code> only overrides the getter functions. This convention would hold until I forgot about it while building a new repo function and thought "wow this would be simpler if I just passed in the entity's ID"</p>
+                    <p>So it needs to be rebuilt. Unfortunately, this is going to change the function signature for most repo functions, which is going to require refactoring the service methods that call them, and in fact the API layer needs to be refactored as well.</p>
 
-                    <p>Either way, this convention would hold until I forgot about it while building a new repo function and thought "wow this would be simpler if I just passed in the entity's ID"</p>
-                    <p>So it needs to be rebuilt. Unfortunately, this is going to change the function signature for most repo functions, which is going to require refactoring the service methods that call them, and in fact the API layer needs to be refactored as well because currently everything is built around the "get first, return 404 if that fails, operate if not" convention.</p>
                     <p>...</p>
                     <h3><a href="2026-08-04.html">View Post</a></h3>
-
-
                 </div>
             </article>
 
-            <!-- Article 2 -->
+            <!-- Article 6 -->
             <article class="article-item" data-expanded="false">
                 <header class="item-header" data-toggle="article">
                     <div class="header-content">
@@ -81,175 +171,6 @@
                     <h3><a href="2026-07-27.html">View Post</a></h3>
                 </div>
             </article>
-
-<!--            &lt;!&ndash; Article 3 &ndash;&gt;-->
-<!--            <article class="article-item" data-expanded="false">-->
-<!--                <header class="item-header" data-toggle="article">-->
-<!--                    <div class="header-content">-->
-<!--                        <h3><a href="2026-08-08.html">Caching Strategies at Scale</a></h3>-->
-<!--                        <time datetime="2026-08-08">August 8, 2026</time>-->
-<!--                    </div>-->
-<!--                    <span class="toggle-indicator"></span>-->
-<!--                </header>-->
-<!--                <div class="preview-content">-->
-<!--                    <p>Caching is one of the most misunderstood tools in a backend engineer's arsenal. This article breaks down cache invalidation patterns, TTL strategies, and when caching actually helps.</p>-->
-<!--                    <p>Many teams reach for caching as a quick performance fix, but without understanding the fundamental trade-offs, you end up with stale data, inconsistent state, or worse—a cache that makes performance worse by adding latency and complexity.</p>-->
-
-<!--                    <h4>Cache Invalidation Patterns</h4>-->
-<!--                    <p>Exploring the differences between TTL-based invalidation, event-driven invalidation, and write-through caching strategies. Each approach has different consistency guarantees and operational overhead.</p>-->
-<!--                    <p>We'll look at real-world examples of when each pattern shines and where they fall apart, including the classic "cache stampede" problem where a popular key expires and hundreds of requests hit your database simultaneously.</p>-->
-
-<!--                    <h4>Cold Start Problem</h4>-->
-<!--                    <p>How to warm your cache before serving production traffic and maintain performance during deploys when your cache is completely emptied. Strategies include lazy loading, background warming, and handling misses gracefully.</p>-->
-<!--                    <p>...</p>-->
-<!--                    <h3><a href="2026-08-08.html">View Post</a></h3>-->
-<!--                </div>-->
-<!--            </article>-->
-
-<!--            &lt;!&ndash; Article 4 &ndash;&gt;-->
-<!--            <article class="article-item" data-expanded="false">-->
-<!--                <header class="item-header" data-toggle="article">-->
-<!--                    <div class="header-content">-->
-<!--                        <h3><a href="2026-08-06.html">Error Handling in Distributed Systems</a></h3>-->
-<!--                        <time datetime="2026-08-06">August 6, 2026</time>-->
-<!--                    </div>-->
-<!--                    <span class="toggle-indicator"></span>-->
-<!--                </header>-->
-<!--                <div class="preview-content">-->
-<!--                    <p>When your system spans multiple services and databases, error handling becomes exponentially more complex. A single failed request can cascade through your entire infrastructure if not handled properly.</p>-->
-<!--                    <p>Traditional try-catch blocks and error codes designed for monolithic systems aren't sufficient in a distributed environment. We need to think about partial failures, network partitions, and degraded service modes.</p>-->
-
-<!--                    <h4>Retry Logic and Exponential Backoff</h4>-->
-<!--                    <p>When to retry, when to fail fast, and how to avoid cascading failures. Exponential backoff with jitter prevents thundering herds where all clients retry at the same time, overwhelming a recovering service.</p>-->
-<!--                    <p>We'll discuss idempotency requirements, retry budgets, and how to implement deadline-aware retries that respect overall request timeouts.</p>-->
-
-<!--                    <h4>Building Bulkheads</h4>-->
-<!--                    <p>Isolating failures to prevent system-wide outages. Bulkhead patterns limit the blast radius of failures by putting hard boundaries around resource usage, thread pools, and queue depths.</p>-->
-<!--                    <p>...</p>-->
-<!--                    <h3><a href="2026-08-06.html">View Post</a></h3>-->
-<!--                </div>-->
-<!--            </article>-->
-
-<!--            &lt;!&ndash; Article 5 &ndash;&gt;-->
-<!--            <article class="article-item" data-expanded="false">-->
-<!--                <header class="item-header" data-toggle="article">-->
-<!--                    <div class="header-content">-->
-<!--                        <h3><a href="2026-08-05.html">Testing Database Logic</a></h3>-->
-<!--                        <time datetime="2026-08-05">August 5, 2026</time>-->
-<!--                    </div>-->
-<!--                    <span class="toggle-indicator"></span>-->
-<!--                </header>-->
-<!--                <div class="preview-content">-->
-<!--                    <p>How do you test repository and service layers without creating fragile tests that break whenever you refactor? This post covers transaction isolation, test fixtures, and integration test strategies that actually scale.</p>-->
-<!--                    <p>The challenge is that database code is inherently difficult to test in isolation. Mocking away the database defeats the purpose of testing the actual queries and constraints, but spinning up a database for every test is slow and complex.</p>-->
-
-<!--                    <h4>Unit Testing Repositories</h4>-->
-<!--                    <p>We explore the trade-offs between mocking databases and using test databases for repository testing. Test containers make spinning up isolated database instances practical, even in CI/CD pipelines.</p>-->
-<!--                    <p>Strategies include using transactions that roll back after each test, test fixtures that establish known state, and query inspection to verify the actual SQL being executed.</p>-->
-
-<!--                    <h4>Service Layer Testing</h4>-->
-<!--                    <p>Testing business logic in isolation while ensuring database contracts are met. Service layer tests sit between unit tests of individual queries and end-to-end tests of entire workflows.</p>-->
-<!--                    <p>...</p>-->
-<!--                    <h3><a href="2026-08-05.html">View Post</a></h3>-->
-<!--                </div>-->
-<!--            </article>-->
-
-<!--            &lt;!&ndash; Article 6 &ndash;&gt;-->
-<!--            <article class="article-item" data-expanded="false">-->
-<!--                <header class="item-header" data-toggle="article">-->
-<!--                    <div class="header-content">-->
-<!--                        <h3><a href="2026-08-02.html">Connection Pooling and Resource Management</a></h3>-->
-<!--                        <time datetime="2026-08-02">August 2, 2026</time>-->
-<!--                    </div>-->
-<!--                    <span class="toggle-indicator"></span>-->
-<!--                </header>-->
-<!--                <div class="preview-content">-->
-<!--                    <p>Database connection pooling is one of those invisible infrastructure decisions that can make or break your application's performance at scale. Most developers inherit a working pool configuration and never think about it again.</p>-->
-<!--                    <p>Until something breaks. A timeout that doesn't timeout, requests hanging indefinitely waiting for a connection, or mysterious 80% CPU utilization with no apparent load. Connection pool misconfiguration is often the culprit.</p>-->
-
-<!--                    <h4>Pool Sizing and Saturation</h4>-->
-<!--                    <p>Understanding how to size your connection pool based on concurrent request load, query duration, and database capacity. A pool that's too small creates contention, but a pool that's too large wastes memory and database resources.</p>-->
-<!--                    <p>We discuss the relationship between application threads and database connections, including why multiplying them can lead to worse performance under load.</p>-->
-
-<!--                    <h4>Timeout Strategies and Deadlock Prevention</h4>-->
-<!--                    <p>Configuring acquisition timeouts, connection timeouts, and statement timeouts to fail gracefully instead of hanging indefinitely. Deadlock detection and recovery patterns that keep your application responsive.</p>-->
-<!--                    <p>...</p>-->
-<!--                    <h3><a href="2026-08-02.html">View Post</a></h3>-->
-<!--                </div>-->
-<!--            </article>-->
-
-<!--            &lt;!&ndash; Article 7 &ndash;&gt;-->
-<!--            <article class="article-item" data-expanded="false">-->
-<!--                <header class="item-header" data-toggle="article">-->
-<!--                    <div class="header-content">-->
-<!--                        <h3><a href="2026-07-28.html">Async Task Queues and Workers</a></h3>-->
-<!--                        <time datetime="2026-07-28">July 28, 2026</time>-->
-<!--                    </div>-->
-<!--                    <span class="toggle-indicator"></span>-->
-<!--                </header>-->
-<!--                <div class="preview-content">-->
-<!--                    <p>Background job processing is essential for scaling web applications beyond the request-response cycle. When you need to send emails, generate reports, or process large datasets, task queues let you defer that work and respond to the user immediately.</p>-->
-<!--                    <p>But adding a queue introduces new failure modes: jobs can be lost, duplicated, or executed out of order. We explore task queue architectures that balance reliability with simplicity.</p>-->
-
-<!--                    <h4>Task Queue Fundamentals</h4>-->
-<!--                    <p>Understanding publish/subscribe patterns, message brokers, and different queue semantics. At-least-once delivery guarantees require idempotent job handlers, while at-most-once is simpler but can lose work.</p>-->
-<!--                    <p>We compare different queue technologies and when to use them, from simple in-process queues to full message brokers like RabbitMQ or Kafka.</p>-->
-
-<!--                    <h4>Worker Management and Scaling</h4>-->
-<!--                    <p>Scaling workers horizontally and dealing with long-running tasks without starving short tasks. Worker heartbeats, task timeouts, and graceful shutdown patterns that prevent job loss during deploys.</p>-->
-<!--                    <p>...</p>-->
-<!--                    <h3><a href="2026-07-28.html">View Post</a></h3>-->
-<!--                </div>-->
-<!--            </article>-->
-
-<!--            &lt;!&ndash; Article 8 &ndash;&gt;-->
-<!--            <article class="article-item" data-expanded="false">-->
-<!--                <header class="item-header" data-toggle="article">-->
-<!--                    <div class="header-content">-->
-<!--                        <h3><a href="2026-07-15.html">API Rate Limiting Done Right</a></h3>-->
-<!--                        <time datetime="2026-07-15">July 15, 2026</time>-->
-<!--                    </div>-->
-<!--                    <span class="toggle-indicator"></span>-->
-<!--                </header>-->
-<!--                <div class="preview-content">-->
-<!--                    <p>Rate limiting protects your backend from abuse and keeps resource costs predictable. Without it, a single misbehaving client or a coordinated attack can consume all your database connections and crash your service.</p>-->
-<!--                    <p>But rate limiting is more nuanced than just counting requests. Different users have different needs, some operations are more expensive than others, and you need to communicate limits clearly so clients can adapt gracefully.</p>-->
-
-<!--                    <h4>Rate Limiting Algorithms</h4>-->
-<!--                    <p>Token bucket vs. sliding window vs. fixed window approaches, each with different CPU/memory trade-offs and accuracy characteristics. Token bucket provides smooth rate limiting, while fixed windows are simpler but allow burst exploitation.</p>-->
-<!--                    <p>We implement each from scratch to understand their behavior under different load patterns, including edge cases like clock skew and the thundering herd problem.</p>-->
-
-<!--                    <h4>Distributed Rate Limiting</h4>-->
-<!--                    <p>Rate limiting across multiple servers with shared state. Redis-backed counters provide consistent limits across your infrastructure, but introduce network latency and potential single points of failure.</p>-->
-<!--                    <p>...</p>-->
-<!--                    <h3><a href="2026-07-15.html">View Post</a></h3>-->
-<!--                </div>-->
-<!--            </article>-->
-
-<!--            &lt;!&ndash; Article 9 &ndash;&gt;-->
-<!--            <article class="article-item" data-expanded="false">-->
-<!--                <header class="item-header" data-toggle="article">-->
-<!--                    <div class="header-content">-->
-<!--                        <h3><a href="2026-07-01.html">Database Migration Strategies</a></h3>-->
-<!--                        <time datetime="2026-07-01">July 1, 2026</time>-->
-<!--                    </div>-->
-<!--                    <span class="toggle-indicator"></span>-->
-<!--                </header>-->
-<!--                <div class="preview-content">-->
-<!--                    <p>Schema migrations are risky operations that can cause extended downtime if not planned carefully. A simple ALTER TABLE that takes seconds in your test environment might lock your entire production database for hours.</p>-->
-<!--                    <p>The solution is to think about migrations as a multi-stage process: prepare your code to handle both old and new schema, deploy that code, migrate the data, then clean up the old schema. It's more work upfront but eliminates downtime and gives you a safe rollback path.</p>-->
-
-<!--                    <h4>Migration Planning and Risk Assessment</h4>-->
-<!--                    <p>Analyzing dependencies and planning safe migration sequences. Large tables require special handling to avoid long locks, and nullable columns require different strategies than adding constraints.</p>-->
-<!--                    <p>We develop a decision tree for choosing between online migrations, dark launches, and staged rollouts depending on table size, traffic patterns, and rollback requirements.</p>-->
-
-<!--                    <h4>Zero-Downtime Patterns</h4>-->
-<!--                    <p>Dual-write periods where both old and new code paths are active, allowing you to migrate data gradually. Dark launches let you test new schema in production before the full cutover, and feature flags provide instant rollback.</p>-->
-<!--                    <p>...</p>-->
-<!--                    <h3><a href="2026-07-01.html">View Post</a></h3>-->
-<!--                </div>-->
-<!--            </article>-->
-
         </div>
     </section>
 </main>

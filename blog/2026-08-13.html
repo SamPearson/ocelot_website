@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Playwright Day 3 - Integrations - Ocelot Code Systems Blog</title>
+    <title>Playwright day 3 - Integrations - Ocelot Code Systems Blog</title>
     <link rel="stylesheet" href="../styles.css">
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -22,7 +22,7 @@
 
 <article class="blog-post">
     <header class="blog-header">
-        <h1 class="blog-title">Playwright Day 3 - Integrations</h1>
+        <h1 class="blog-title">Playwright day 3 - Integrations</h1>
         <p class="post-metadata">
             <time datetime="2026-08-13">August 13, 2026</time>
         </p>
@@ -30,135 +30,125 @@
 
     <div class="blog-content">
         <section class="blog-section">
-            <p>The last remaining articles in Playwright's "Getting Started" section are:</p>
-
+            <p>The last remaining articles in Playwright's "Getting Started" section are</p>
             <ul>
-                <li>Running and debugging</li>
-                <li>Trace viewer</li>
-                <li>CI integration</li>
-                <li>VS Code integration</li>
+            <li>
+            <p>running and debugging</p>
+            </li>
+            <li>
+            <p>trace viewer</p>
+            </li>
+            <li>
+            <p>CI integration</p>
+            </li>
+            <li>
+            <p>VS Code integration</p>
+            </li>
             </ul>
-
             <p>This is everything but writing tests. How to run and review tests, how to integrate with an IDE, how to embed in a CI/CD pipeline.</p>
-
-            <p>After this block is done, I can start ramping up on generating a whole glut of tiny practice tests. I'll want to swap "VS Code integration" for WebStorm or something, but I can probably spin up a Jenkins install on ocelotcodesystems.com to embed an arbitrarily simple Playwright test for the CI section.</p>
+            <p>After this block is done, I can start ramping up on generating a whole glut of tiny practice tests. I'll want to swap "vs code integration" for webstorm or something, but I can probably spin up a jenkins install on ocelotcodesystems.com to embed an arbitrarily simple playwright test for the CI section.</p>
         </section>
 
         <section class="blog-section">
             <h2>Running and Debugging</h2>
-
-            <p>Running is very simple:</p>
-            <pre><code class="language-bash">npx playwright test</code></pre>
-
+            <p>Running is very simple</p>
+            <pre><code>npx playwright test
+            </code></pre>
             <p>Playwright can also run tests in a "ui" mode, which sounds extremely promising.</p>
-
-            <div class="callout">
-                <p>You can easily walk through each step of the test and visually see what was happening before, during and after each step. UI mode also comes with many other features such as the locator picker, watch mode and more.</p>
-            </div>
-
+            <blockquote>
+            <p>you can easily walk through each step of the test and visually see what was happening before, during and after each step. UI mode also comes with many other features such as the locator picker, watch mode and more.</p>
+            </blockquote>
             <p>Where have you been all my life?</p>
-
-            <pre><code class="language-bash">npx playwright test --ui</code></pre>
-
-            <p>This is fantastic. You can adjust locators on the fly, see what worked and didn't and why, you can watch tests as they're run, edit and rewatch. This is going to save a phenomenal amount of time over hacking in some kind of CSS highlighting and screenshot fixture for failed tests.</p>
-
-            <p>I think I'll revisit the test from day 2 and see what I can find by analyzing the test in UI mode.</p>
-
+            <pre><code>npx playwright test --ui
+            </code></pre>
+            <p>This is fantastic. You can adjust locators on the fly, see what worked and didnt and why, you can watch tests as they're run, edit and rewatch, this is going to save a phenomenal amount of time over hacking in some kind of css highlighting and screenshot fixture for failed tests.</p>
+            <p>I think I'll revisit the test from day 2 and see what I can find by analyzing the test in ui mode.</p>
             <pre><code>Error: expect(locator).toBeVisible() failed
-
-Locator: getByText('Images')
-Expected: visible
-Error: strict mode violation: getByText('Images') resolved to 3 elements:
-    1) &lt;a class="gb_6" data-pid="2" target="_top" aria-label="Search for Images " href="https://www.google.com/imghp?hl=en&ogbl"&gt;Images&lt;/a&gt; aka getByRole('link', { name: 'Search for Images' })
-    2) &lt;span&gt;Create images&lt;/span&gt; aka getByText('Create images', { exact: true })
-    3) &lt;span id="sb-accessible-label-4"&gt;Remove Create Images&lt;/span&gt; aka getByText('Remove Create Images')
-
-Call log:
-  - Expect "toBeVisible" with timeout 5000ms
-  - waiting for getByText('Images')</code></pre>
-
-            <p>Definitely would have sped up diagnosing the last test.</p>
-
-            <p>I guess the stack trace isn't necessary because there's a "source" section that just highlights the exact line you were at, and a Playwright test probably isn't going to have an interesting stack. It's not like the database repository file chokes but you want to see the service layer, API layer, etc — the goal with Playwright is almost definitely to just have a few files with a few tests sitting in each.</p>
-
+            
+            Locator: getByText('Images')
+            Expected: visible
+            Error: strict mode violation: getByText('Images') resolved to 3 elements:
+                1) &lt;a class=&quot;gb_6&quot; data-pid=&quot;2&quot; target=&quot;_top&quot; aria-label=&quot;Search for Images &quot; href=&quot;https://www.google.com/imghp?hl=en&amp;ogbl&quot;&gt;Images&lt;/a&gt; aka getByRole('link', { name: 'Search for Images' })
+                2) &lt;span&gt;Create images&lt;/span&gt; aka getByText('Create images', { exact: true })
+                3) &lt;span id=&quot;sb-accessible-label-4&quot;&gt;Remove Create Images&lt;/span&gt; aka getByText('Remove Create Images')
+            
+            Call log:
+              - Expect &quot;toBeVisible&quot; with timeout 5000ms
+              - waiting for getByText('Images')
+            </code></pre>
+            <p>Definitely would have sped up diagnosing the last test. </p>
+            <p>I guess the stack trace isn't necessar buecase there's a "source" section that just highlights the exact line you were at, and a playwright test probably isn't going to have an interesting stack. It's not like the database repository file chokes but you want to see the service layer, api layer, etc - the goal with playwright is almost definitely to just have a few files with a few tests sitting in each.</p>
             <p>Having a timeline is nice, that could be good for identifying laggy tests.</p>
-
-            <p>There's a popout tool that you can use to analyze the state of the DOM at any point during the test.</p>
-
-            <h3>Test Execution Options</h3>
-
-            <p>Headless is the default but you can run headed like so:</p>
-            <pre><code class="language-bash">npx playwright test --headed</code></pre>
-
-            <p>You can specify which browser(s) to run tests in:</p>
-            <pre><code class="language-bash">npx playwright test --project webkit --project firefox</code></pre>
-
-            <p>You can rerun only the tests which failed the last run:</p>
-            <pre><code class="language-bash">npx playwright test --last-failed</code></pre>
-
+            <p>There's a popout tool that you can use to analyze the state of the dom at any point during the test.</p>
+            <p>Other options for running tests:</p>
+            <p>headless is the default but you can run headed like so:</p>
+            <pre><code>npx playwright test --headed
+            </code></pre>
+            <p>You can specify which browser(s) to run tests in</p>
+            <pre><code>npx playwright test --project webkit --project firefox
+            </code></pre>
+            <p>You can rerun only the tests which failed the last run: </p>
+            <pre><code>npx playwright test --last-failed
+            </code></pre>
             <p>The "last failed" list is automatically managed.</p>
-
             <p>Default location is here: <code>&lt;outputDir&gt;/.last-run.json</code></p>
-
-            <p>But you can specify the path to a "last failed" file:</p>
-            <pre><code class="language-bash">npx playwright test --last-failed --last-failed-file=.cache/last-run-shard-1.json</code></pre>
-
+            <p>But you can specify the path to a "last failed" file</p>
+            <pre><code>npx playwright test --last-failed --last-failed-file=.cache/last-run-shard-1.json
+            </code></pre>
             <h3>Test Grouping and Tagging</h3>
-
             <p>Specific tests or groups of tests can be run like so:</p>
-            <pre><code class="language-bash"># run one test file
-npx playwright test landing-page.spec.ts
-
-# run directories of test files
-npx playwright test tests/todo-page/ tests/landing-page/</code></pre>
-
-            <p>There appears to be a makeshift tag system; you can run the tests that have search terms in the titles:</p>
-            <pre><code class="language-bash">npx playwright test landing login</code></pre>
-
+            <pre><code># run one test file
+            npx playwright test landing-page.spec.ts
+            
+            # run directories of test files
+            npx playwright test tests/todo-page/ tests/landing-page/
+            </code></pre>
+            <p>There appears to be a makeshift tag system; you can run the tests that have search terms in the titles</p>
+            <pre><code>npx playwright test landing login
+            </code></pre>
             <p>Actually, there appears to be a tag system as well. This is the counterpart for pytest markers.</p>
-
             <p>Tagging individual tests:</p>
             <pre><code class="language-typescript">test('test login page', {
-  tag: '@fast',
-}, async ({ page }) => {
-  // ...
-});
-
-test('test full report @slow', async ({ page }) => {
-  // ...
-});</code></pre>
-
+              tag: '@fast',
+            }, async ({ page }) =&gt; {
+              // ...
+            });
+            
+            test('test full report @slow', async ({ page }) =&gt; {
+              // ...
+            });
+            </code></pre>
             <p>Tagging a test group:</p>
             <pre><code class="language-typescript">import { test, expect } from '@playwright/test';
-
-test.describe('group', {
-  tag: '@report',
-}, () => {
-  test('test report header', async ({ page }) => {
-    // ...
-  });
-
-  test('test full report', {
-    tag: ['@slow', '@vrt'],
-  }, async ({ page }) => {
-    // ...
-  });
-});</code></pre>
-
-            <p>You can grep for tags when running:</p>
-            <pre><code class="language-bash">npx playwright test --grep @fast</code></pre>
-
-            <p>You can skip tests based on tags:</p>
-            <pre><code class="language-bash">npx playwright test --grep-invert @fast</code></pre>
-
-            <p>Logical operators:</p>
-            <pre><code class="language-bash"># AND operator
-npx playwright test --grep "@fast|@slow"
-
-# OR operator
-npx playwright test --grep "(?=.*@fast)(?=.*@slow)"</code></pre>
-
-            <p>You can likely flex grep and get real complex with how you decide what to run.</p>
+            
+            test.describe('group', {
+              tag: '@report',
+            }, () =&gt; {
+              test('test report header', async ({ page }) =&gt; {
+                // ...
+              });
+            
+              test('test full report', {
+                tag: ['@slow', '@vrt'],
+              }, async ({ page }) =&gt; {
+                // ...
+              });
+            });
+            </code></pre>
+            <p>You can grep for tags when running</p>
+            <pre><code>npx playwright test --grep @fast
+            </code></pre>
+            <p>You can skip tests based on tags</p>
+            <pre><code>npx playwright test --grep-invert @fast
+            </code></pre>
+            <p>Locical operators:</p>
+            <pre><code># AND operator
+            npx playwright test --grep &quot;@fast|@slow&quot;
+            
+            # OR operator
+            npx playwright test --grep &quot;(?=.*@fast)(?=.*@slow)&quot;
+            </code></pre>
+            <p>you can likely flex grep and get real complex with how you decide what to run.</p>
         </section>
     </div>
 </article>

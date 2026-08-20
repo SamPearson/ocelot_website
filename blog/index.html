@@ -37,138 +37,105 @@
             <article class="article-item" data-expanded="false">
                 <header class="item-header" data-toggle="article">
                     <div class="header-content">
-                        <h3><a href="2026-08-14.html">Playwright Day 4 - Grouping Tests & Troubleshooting IO</a></h3>
+                        <h3><a href="2026-08-19.html">Playwright Day 5 - Grouping Tests</a></h3>
+                        <time datetime="2026-08-19">August 19, 2026</time>
+                    </div>
+                    <span class="toggle-indicator"></span>
+                </header>
+                <div class="preview-content">
+                    <p>Day 4 was supposed to be about grouping tests, but I got sidetracked debugging a resource issue. Still very valid experience, but now that it's done I can wrap up test grouping, then move on to CI integration and IDE integration.</p>
+                    <h4>Specifying Tests</h4>
+                    <p>Run everything:</p>
+                    <p>...</p>
+                    <h3><a href="2026-08-19.html">View Post</a></h3>
+                </div>
+            </article>
+            <!-- Article 2 -->
+            <article class="article-item" data-expanded="false">
+                <header class="item-header" data-toggle="article">
+                    <div class="header-content">
+                        <h3><a href="2026-08-14.html">Playwright Day 4 - Grouping Tests &amp; Troubleshooting IO</a></h3>
                         <time datetime="2026-08-14">August 14, 2026</time>
                     </div>
                     <span class="toggle-indicator"></span>
                 </header>
                 <div class="preview-content">
-                    <p>Day 3 was about learning the different ways that tests can be grouped and selected for running. This provides a good opportunity to memorize syntax by typing out a glut of tests.</p>
-
-                    <h4>Investigating Test Failures</h4>
-                    <p>At a glance everything was going great. I ran the tests in UI mode, immediately identified that I had missed a <code>.click()</code> on one of the tests, fixed it, ran it again.</p>
-
-                    <p>But these tests are feeling super flaky. One of the tests fails on Firefox like 10-20% of the time; and it's failing on the navigation step. I shouldn't be getting 30 second timeout failures on "go to this page".</p>
-
+                    <p>Day 3 was about learning the different ways that tests can be grouped and selected for running.</p>
+                    <h4>Investigating test failures</h4>
+                    <p>At a glance everything was going great. I ran the tests in UI mode, immediately identified that I had missed a ".click()" on one of the tests, fixed it, ran it again.</p>
                     <h4>Resource Investigation</h4>
-                    <p>I started suspecting resource constraints, but after investigation discovered the real culprit: home directory encryption was causing excessive IO wait times. Moving the project directory to <code>/tmp</code> resolved the issue almost entirely.</p>
-
+                    <p>I started suspecting resource constraints, so I limited the test to one simultaneous worker, like so:</p>
                     <p>...</p>
                     <h3><a href="2026-08-14.html">View Post</a></h3>
                 </div>
             </article>
-
-            <!-- Article 2 -->
+            <!-- Article 3 -->
             <article class="article-item" data-expanded="false">
                 <header class="item-header" data-toggle="article">
                     <div class="header-content">
-                        <h3><a href="2026-08-13.html">Playwright Day 3 - Integrations</a></h3>
+                        <h3><a href="2026-08-13.html">Playwright day 3 - Integrations</a></h3>
                         <time datetime="2026-08-13">August 13, 2026</time>
                     </div>
                     <span class="toggle-indicator"></span>
                 </header>
                 <div class="preview-content">
-                    <p>The last remaining particles in Playwright's "Getting Started" section are running and debugging, trace viewer, CI integration, and VS Code integration.</p>
-
+                    <p>The last remaining articles in Playwright's "Getting Started" section are</p>
                     <h4>Running and Debugging</h4>
-                    <p>Running is very simple with <code>npx playwright test</code>. Playwright can also run tests in a "ui" mode which allows you to easily walk through each step of the test and visually see what was happening before, during and after each step.</p>
-
-                    <h4>Test Grouping and Tagging</h4>
-                    <p>Specific tests or groups of tests can be run in various ways, including through a tag system that acts as the counterpart for pytest markers. You can grep for tags when running and even use logical operators to get complex with how you decide what to run.</p>
-
+                    <p>Running is very simple</p>
                     <p>...</p>
                     <h3><a href="2026-08-13.html">View Post</a></h3>
                 </div>
             </article>
-
-            <!-- Article 3 -->
+            <!-- Article 4 -->
             <article class="article-item" data-expanded="false">
                 <header class="item-header" data-toggle="article">
                     <div class="header-content">
-                        <h3><a href="2026-08-11.html">Playwright Day 2: Test Writing Basics</a></h3>
+                        <h3><a href="2026-08-11.html">Playwright Day 2 : Test Writing Basics</a></h3>
                         <time datetime="2026-08-11">August 11, 2026</time>
                     </div>
                     <span class="toggle-indicator"></span>
                 </header>
                 <div class="preview-content">
-                    <p>Turns out the <code>GetByRole</code> function seen in example tests is part of a whole API of element-getters including <code>getByText</code>, <code>getByLabel</code>, <code>getByPlaceholder</code>, <code>getByAltText</code>, <code>getByTitle</code>, and <code>getByTestId</code>.</p>
-
-                    <h4>Locators</h4>
-                    <p>The locators API is quite flexible and chainable, allowing you to narrow searches. However, the recommended approach of using role locators to identify elements the way users do has some tradeoffs when it comes to brittle tests if text changes.</p>
-
-                    <h4>Actions and Assertions</h4>
-                    <p>There are convenient functions for interacting with elements like <code>click()</code>, <code>fill()</code>, <code>check()</code>, and assertion methods like <code>toBeVisible()</code>, <code>toHaveText()</code>, and <code>toHaveValue()</code> that keep the framework reading like plain English.</p>
-
+                    <h4>Writing Tests</h4>
+                    <p>Turns out the "GetByRole" function I saw in the example test is part of a whole API of element-getters:</p>
+                    <h4>Generating Tests</h4>
+                    <p>CodeGen is a cool little tool that allows you to generate code by navigating around a website.</p>
                     <p>...</p>
                     <h3><a href="2026-08-11.html">View Post</a></h3>
                 </div>
             </article>
-
-            <!-- Article 4 -->
+            <!-- Article 5 -->
             <article class="article-item" data-expanded="false">
                 <header class="item-header" data-toggle="article">
                     <div class="header-content">
-                        <h3><a href="2026-08-10.html">Playwright Day 1 - Hello World</a></h3>
+                        <h3><a href="2026-08-10.html">Playwright Day 1 -  Hello World</a></h3>
                         <time datetime="2026-08-10">August 10, 2026</time>
                     </div>
                     <span class="toggle-indicator"></span>
                 </header>
                 <div class="preview-content">
                     <p>Here we go.</p>
-
-                    <h4>Installation & Test 1 - the built-in test</h4>
-                    <p>Install Playwright with <code>npm install playwright</code> and initialize projects with <code>npm init playwright@latest</code>. Then update dependencies and you can run the example test they provide.</p>
-
-                    <p>They provide a clean looking example test with syntax that is practically human readable, with the possible exception of the <code>GetByRole</code> function which is clear enough once you understand it.</p>
-
-                    <p>Counting this as 1/100 tests in the bag lol</p>
+                    <h4>Installation &amp; Test 1 - the built-in test</h4>
+                    <p>install it with `npm install playwright`,</p>
                     <p>...</p>
                     <h3><a href="2026-08-10.html">View Post</a></h3>
                 </div>
             </article>
-
-            <!-- Article 5 -->
+            <!-- Article 6 -->
             <article class="article-item" data-expanded="false">
                 <header class="item-header" data-toggle="article">
                     <div class="header-content">
                         <h3><a href="2026-08-04.html">Repository-Level API Security</a></h3>
-                        <time datetime="2026-08-04">August 4, 2026</time>
+                        <time datetime="2026-08-04">August 04, 2026</time>
                     </div>
                     <span class="toggle-indicator"></span>
                 </header>
                 <div class="preview-content">
                     <p>In a backend I built for a webapp, the database has model/service/repo layers. The repository layer was meant to have some built-in security.</p>
-                    <p>There's a <code>BaseRepository</code> with basic CRUD functions, and then a <code>UserOwnedRepository</code> which overwrites those functions and requires a <code>user_id</code> as a parameter. The idea being that the API layer would require an auth token, extract the user id from it, and the repo/service layers would be restricted from editing anything not owned by the user who made the request.</p>
-
-                    <h4>The Problem</h4>
-                    <p>The <code>UserOwnedRepository</code> only overrides the getter functions. This convention would hold until I forgot about it while building a new repo function and thought "wow this would be simpler if I just passed in the entity's ID"</p>
-                    <p>So it needs to be rebuilt. Unfortunately, this is going to change the function signature for most repo functions, which is going to require refactoring the service methods that call them, and in fact the API layer needs to be refactored as well.</p>
-
+                    <h4>The Plan</h4>
+                    <p>We still need that pattern of using a getter to check if the entity exists, and in fact I think we're going to have to use it both at the repo layer and at the service layer.</p>
                     <p>...</p>
                     <h3><a href="2026-08-04.html">View Post</a></h3>
-                </div>
-            </article>
-
-            <!-- Article 6 -->
-            <article class="article-item" data-expanded="false">
-                <header class="item-header" data-toggle="article">
-                    <div class="header-content">
-                        <h3><a href="2026-07-27.html">Catchlist Architecture Review</a></h3>
-                        <time datetime="2026-07-27">July 27, 2026</time>
-                    </div>
-                    <span class="toggle-indicator"></span>
-                </header>
-                <div class="preview-content">
-                    <p>Catchlist is a productivity application for managing tasks, projects, routines, and commitments — but it's primarily an exercise in building a small app with commercial-grade infrastructure: a frontend/backend split, dev/staging/production environments, CI/CD, automated testing, and an architecture where every behavior has an obvious home.</p>
-                    <p>The writeup walks through the full system structure, driven by a single guiding principle: entities flow through a consistent pattern of model, repository, service, presenter, API routes, and webapp routes, keeping responsibilities clear at every layer.</p>
-
-                    <h4>Tradeoffs</h4>
-                    <p>Splitting API and webapp into two services adds deployment complexity, but enforces a clean separation between presentation and backend logic. Timezone and recurring event handling go beyond the usual "store in UTC" advice to preserve intent across DST changes. And explicitness is deliberately favored over minimalism — even when it means more files — because complex is better than complicated.</p>
-
-                    <h4>Lessons Learned</h4>
-                    <p>The review covers modeling recurring events without losing their meaning, the pain of an inverted testing pyramid (a glut of brittle end-to-end tests), and how repository layers can silently drift into containing business logic.</p>
-                    <p>...</p>
-                    <h3><a href="2026-07-27.html">View Post</a></h3>
                 </div>
             </article>
         </div>

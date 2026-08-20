@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Playwright Day 2: data-testid - Ocelot Code Systems Blog</title>
+    <title>Playwright Day 2 : Test Writing Basics - Ocelot Code Systems Blog</title>
     <link rel="stylesheet" href="../styles.css">
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -22,7 +22,7 @@
 
 <article class="blog-post">
     <header class="blog-header">
-        <h1 class="blog-title">Playwright Day 2: Test Writing Basics</h1>
+        <h1 class="blog-title">Playwright Day 2 : Test Writing Basics</h1>
         <p class="post-metadata">
             <time datetime="2026-08-11">August 11, 2026</time>
         </p>
@@ -30,335 +30,295 @@
 
     <div class="blog-content">
         <section class="blog-section">
+
+        </section>
+
+        <section class="blog-section">
             <h2>Writing Tests</h2>
-
             <h3>Locators</h3>
-
-            <p>Turns out the <code>GetByRole</code> function I saw in the example test is part of a whole API of element-getters:</p>
-
+            <p>Turns out the "GetByRole" function I saw in the example test is part of a whole API of element-getters: </p>
             <ul>
-                <li><a href="https://playwright.dev/docs/locators#locate-by-role">page.getByRole()</a> to locate by explicit and implicit accessibility attributes.</li>
-                <li><a href="https://playwright.dev/docs/locators#locate-by-text">page.getByText()</a> to locate by text content.</li>
-                <li><a href="https://playwright.dev/docs/locators#locate-by-label">page.getByLabel()</a> to locate a form control by associated label's text.</li>
-                <li><a href="https://playwright.dev/docs/locators#locate-by-placeholder">page.getByPlaceholder()</a> to locate an input by placeholder.</li>
-                <li><a href="https://playwright.dev/docs/locators#locate-by-alt-text">page.getByAltText()</a> to locate an element, usually image, by its text alternative.</li>
-                <li><a href="https://playwright.dev/docs/locators#locate-by-title">page.getByTitle()</a> to locate an element by its title attribute.</li>
-                <li><a href="https://playwright.dev/docs/locators#locate-by-test-id">page.getByTestId()</a> to locate an element based on its <code>data-testid</code> attribute (other attributes can be configured).</li>
+            <li><a href="https://playwright.dev/docs/locators#locate-by-role">page.getByRole()</a> to locate by explicit and implicit accessibility attributes.</li>
+            <li><a href="https://playwright.dev/docs/locators#locate-by-text">page.getByText()</a> to locate by text content.</li>
+            <li><a href="https://playwright.dev/docs/locators#locate-by-label">page.getByLabel()</a> to locate a form control by associated label's text.</li>
+            <li><a href="https://playwright.dev/docs/locators#locate-by-placeholder">page.getByPlaceholder()</a> to locate an input by placeholder.</li>
+            <li><a href="https://playwright.dev/docs/locators#locate-by-alt-text">page.getByAltText()</a> to locate an element, usually image, by its text alternative.</li>
+            <li><a href="https://playwright.dev/docs/locators#locate-by-title">page.getByTitle()</a> to locate an element by its title attribute.</li>
+            <li><a href="https://playwright.dev/docs/locators#locate-by-test-id">page.getByTestId()</a> to locate an element based on its <code>data-testid</code> attribute (other attributes can be configured). </li>
             </ul>
-
-            <p>I keep going back to Selenium, but having "get by testid" just be a single function is awesome. It feels weird having to add a wrapper function for that functionality.</p>
-
-            <p>It looks like these are chainable so you can narrow searches as well, that's good.</p>
-
+            <p>I keep going to back to selenium, but having "get by testid" just be a single function is awesome. It feels weird having to add a wrapper function for that functionality.</p>
+            <p>It looks like these are chainable so you can narrow searches as well, that's good. </p>
             <pre><code class="language-typescript">const locator = page
-    .frameLocator('#my-frame')
-    .getByRole('button', { name: 'Sign in' });
-
-await locator.click();</code></pre>
-
-            <p>Look at how flexible this is:</p>
-
+                .frameLocator('#my-frame')
+                .getByRole('button', { name: 'Sign in' });
+            
+            await locator.click();
+            </code></pre>
+            <p>Look at how flexible this is</p>
             <pre><code class="language-html">&lt;h3&gt;Sign up&lt;/h3&gt;
-&lt;label&gt;
-  &lt;input type="checkbox" /&gt; Subscribe
-&lt;/label&gt;
-&lt;br/&gt;
-&lt;button&gt;Submit&lt;/button&gt;</code></pre>
-
+            &lt;label&gt;
+              &lt;input type=&quot;checkbox&quot; /&gt; Subscribe
+            &lt;/label&gt;
+            &lt;br/&gt;
+            &lt;button&gt;Submit&lt;/button&gt;
+            </code></pre>
             <pre><code class="language-typescript">await expect(page.getByRole('heading', { name: 'Sign up' })).toBeVisible();
-
-await page.getByRole('checkbox', { name: 'Subscribe' }).check();
-
-await page.getByRole('button', { name: /submit/i }).click();</code></pre>
-
-            <p>It honestly reads as kind of brittle, like you should probably get your devs to insert a <code>data-testid</code> element. I've heard some people say "no it's better to have the test identify things the way the user does", but the user is not an automated machine with literally no intuition; if someone changes the text from "Sign up" to something syntactically different but semantically the same, the test may break.</p>
-
-            <p>Of course testid is just as, if not more, accessible via Playwright, so it's not really a big deal unless it's culturally decided that <code>data-testid</code> attributes are bad.</p>
-
-            <p>I say that, and then immediately find this guidance on when to use role locators:</p>
-
-            <div class="callout">
-                <p>We recommend prioritizing role locators to locate elements, as it is the closest way to how users and assistive technology perceive the page.</p>
-            </div>
-
-            <p>Honestly I disagree with this, but I think the right path is to use the language standard tools and keep my suspected drawbacks pocketed; if tests really do end up being brittle because of this, then this is all just a bargaining chip to get <code>data-testid</code> attributes implemented.</p>
-
-            <p>Anyway, it's neat that they say <em>when</em> a given locator type should be used.</p>
-
+            
+            await page.getByRole('checkbox', { name: 'Subscribe' }).check();
+            
+            await page.getByRole('button', { name: /submit/i }).click();
+            
+            
+            
+            </code></pre>
+            <p>It honestly reads as kind of brittle, like you should probably get your devs to insert a data-testid element. I've heard some people say "no it's better to have the test identify things the way the user does", but the user is not an automated machine with literally no intuition; if someone changes the text from "Sign up" to something syntactically different but semantically the same, the test may break. </p>
+            <p>Of course testid is just as, if not more, accessible via playwright, so it's not really a big deal unless it's culturally decided that data-testid attributes are bad.</p>
+            <p>I say that, and then immediately find this guidance on when to use role locators: </p>
+            <blockquote>
+            <p>We recommend prioritizing role locators to locate elements, as it is the closest way to how users and assistive technology perceive the page.</p>
+            </blockquote>
+            <p>Honestly I disagree with this, but I think the right path is to use the language standard tools and keep my suspected drawbacks pocketted; if tests really do end up being brittle because of this, then this is all just a bargaining chip to get data-testid attributes implemented.</p>
+            <p>Anyway, it's neat that they say <em>when</em> a given locator type should be used. </p>
             <p><strong>label</strong> locator:</p>
-            <div class="callout">
-                <p>Use this locator when locating form fields.</p>
-            </div>
-
+            <blockquote>
+            <p>Use this locator when locating form fields.</p>
+            </blockquote>
             <p><strong>placeholder</strong> locator:</p>
-            <div class="callout">
-                <p>Use this locator when locating form elements that do not have labels but do have placeholder texts.</p>
-            </div>
-
+            <blockquote>
+            <p>Use this locator when locating form elements that do not have labels but do have placeholder texts.</p>
+            </blockquote>
             <p><strong>text</strong> locator:</p>
-            <div class="callout">
-                <p>We recommend using text locators to find non interactive elements like <code>div</code>, <code>span</code>, <code>p</code>, etc. For interactive elements like <code>button</code>, <code>a</code>, <code>input</code>, etc. use <a href="https://playwright.dev/docs/locators#locate-by-role">role locators</a>.</p>
-            </div>
-
+            <blockquote>
+            <p>We recommend using text locators to find non interactive elements like <code>div</code>, <code>span</code>, <code>p</code>, etc. For interactive elements like <code>button</code>, <code>a</code>, <code>input</code>, etc. use <a href="https://playwright.dev/docs/locators#locate-by-role">role locators</a>.</p>
+            </blockquote>
             <p><strong>testid</strong> locator:</p>
-            <div class="callout">
-                <p>Testing by test ids is the most resilient way of testing as even if your text or role of the attribute changes, the test will still pass. QA's and developers should define explicit test ids and query them with <a href="https://playwright.dev/docs/api/class-page#page-get-by-test-id">page.getByTestId()</a>. However testing by test ids is not user facing. If the role or text value is important to you then consider using user facing locators such as <a href="https://playwright.dev/docs/locators#locate-by-role">role</a> and <a href="https://playwright.dev/docs/locators#locate-by-text">text locators</a>.</p>
-            </div>
-
-            <p>I think it would be best to locate by testid and then just add an assertion for the text, allowing the test to cleanly fail if it changes, but this also puts a maintenance burden on whoever is embedding those <code>data-testid</code> attributes.</p>
-
-            <div class="callout">
-                <p>You can also use test ids when you choose to use the test id methodology or when you can't locate by <a href="https://playwright.dev/docs/locators#locate-by-role">role</a> or <a href="https://playwright.dev/docs/locators#locate-by-text">text</a>.</p>
-            </div>
-
-            <p>Oh this is tremendous, look at this, you can change it to not strictly search for <code>data-testid</code> but another attribute entirely:</p>
-
+            <blockquote>
+            <p>Testing by test ids is the most resilient way of testing as even if your text or role of the attribute changes, the test will still pass. QA's and developers should define explicit test ids and query them with <a href="https://playwright.dev/docs/api/class-page#page-get-by-test-id">page.getByTestId()</a>. However testing by test ids is not user facing. If the role or text value is important to you then consider using user facing locators such as <a href="https://playwright.dev/docs/locators#locate-by-role">role</a> and <a href="https://playwright.dev/docs/locators#locate-by-text">text locators</a>.</p>
+            </blockquote>
+            <p>I think it would be best to locate by testid and then just add an assertion for the text, allowing the test to cleanly fail if it changes, but this also puts a maintenance burden on whoever is embedding those data-testid attributes. </p>
+            <blockquote>
+            <p>You can also use test ids when you choose to use the test id methodology or when you can't locate by <a href="https://playwright.dev/docs/locators#locate-by-role">role</a> or <a href="https://playwright.dev/docs/locators#locate-by-text">text</a>.</p>
+            </blockquote>
+            <p>Oh this is tremendous, look at this, you can change it to not strictly search for data-testid but another attribute entirely: </p>
             <pre><code class="language-typescript">import { defineConfig } from '@playwright/test';
-
-export default defineConfig({
-  use: {
-    testIdAttribute: 'data-pw'
-  }
-});</code></pre>
-
+            
+            export default defineConfig({
+              use: {
+                testIdAttribute: 'data-pw'
+              }
+            });
+            </code></pre>
             <p>Some leftovers that may be useful:</p>
-
-            <p><strong>alt text locator:</strong></p>
-            <div class="callout">
-                <p>Use this locator when your element supports alt text such as <code>img</code> and <code>area</code> elements.</p>
-            </div>
-
-            <p><strong>title locator:</strong></p>
-            <div class="callout">
-                <p>Use this locator when your element has the <code>title</code> attribute.</p>
-            </div>
-        </section>
-
-        <section class="blog-section">
+            <p>alt text locator:</p>
+            <blockquote>
+            <p>Use this locator when your element supports alt text such as <code>img</code> and <code>area</code> elements.</p>
+            </blockquote>
+            <p>title locator:</p>
+            <blockquote>
+            <p>Use this locator when your element has the <code>title</code> attribute.</p>
+            </blockquote>
             <h3>Actions</h3>
-
             <p>The actions we can take on elements after locating them:</p>
-
-            <div style="overflow-x: auto; margin: var(--s2) 0;">
-                <table style="width: 100%; border-collapse: collapse;">
-                    <tr style="border-bottom: 1px solid var(--line);">
-                        <th style="text-align: left; padding: var(--s1);">Action</th>
-                        <th style="text-align: left; padding: var(--s1);">Description</th>
-                    </tr>
-                    <tr style="border-bottom: 1px solid var(--line);">
-                        <td style="padding: var(--s1);"><a href="https://playwright.dev/docs/api/class-locator#locator-check">locator.check()</a></td>
-                        <td style="padding: var(--s1);">Check the input checkbox</td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid var(--line);">
-                        <td style="padding: var(--s1);"><a href="https://playwright.dev/docs/api/class-locator#locator-click">locator.click()</a></td>
-                        <td style="padding: var(--s1);">Click the element</td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid var(--line);">
-                        <td style="padding: var(--s1);"><a href="https://playwright.dev/docs/api/class-locator#locator-uncheck">locator.uncheck()</a></td>
-                        <td style="padding: var(--s1);">Uncheck the input checkbox</td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid var(--line);">
-                        <td style="padding: var(--s1);"><a href="https://playwright.dev/docs/api/class-locator#locator-hover">locator.hover()</a></td>
-                        <td style="padding: var(--s1);">Hover mouse over the element</td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid var(--line);">
-                        <td style="padding: var(--s1);"><a href="https://playwright.dev/docs/api/class-locator#locator-fill">locator.fill()</a></td>
-                        <td style="padding: var(--s1);">Fill the form field, input text</td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid var(--line);">
-                        <td style="padding: var(--s1);"><a href="https://playwright.dev/docs/api/class-locator#locator-focus">locator.focus()</a></td>
-                        <td style="padding: var(--s1);">Focus the element</td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid var(--line);">
-                        <td style="padding: var(--s1);"><a href="https://playwright.dev/docs/api/class-locator#locator-press">locator.press()</a></td>
-                        <td style="padding: var(--s1);">Press single key</td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid var(--line);">
-                        <td style="padding: var(--s1);"><a href="https://playwright.dev/docs/api/class-locator#locator-set-input-files">locator.setInputFiles()</a></td>
-                        <td style="padding: var(--s1);">Pick files to upload</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: var(--s1);"><a href="https://playwright.dev/docs/api/class-locator#locator-select-option">locator.selectOption()</a></td>
-                        <td style="padding: var(--s1);">Select option in the drop down</td>
-                    </tr>
-                </table>
-            </div>
-        </section>
-
-        <section class="blog-section">
+            <table>
+            <thead>
+            <tr>
+            <th>Action</th>
+            <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+            <td><a href="https://playwright.dev/docs/api/class-locator#locator-check">locator.check()</a></td>
+            <td>Check the input checkbox</td>
+            </tr>
+            <tr>
+            <td><a href="https://playwright.dev/docs/api/class-locator#locator-click">locator.click()</a></td>
+            <td>Click the element</td>
+            </tr>
+            <tr>
+            <td><a href="https://playwright.dev/docs/api/class-locator#locator-uncheck">locator.uncheck()</a></td>
+            <td>Uncheck the input checkbox</td>
+            </tr>
+            <tr>
+            <td><a href="https://playwright.dev/docs/api/class-locator#locator-hover">locator.hover()</a></td>
+            <td>Hover mouse over the element</td>
+            </tr>
+            <tr>
+            <td><a href="https://playwright.dev/docs/api/class-locator#locator-fill">locator.fill()</a></td>
+            <td>Fill the form field, input text</td>
+            </tr>
+            <tr>
+            <td><a href="https://playwright.dev/docs/api/class-locator#locator-focus">locator.focus()</a></td>
+            <td>Focus the element</td>
+            </tr>
+            <tr>
+            <td><a href="https://playwright.dev/docs/api/class-locator#locator-press">locator.press()</a></td>
+            <td>Press single key</td>
+            </tr>
+            <tr>
+            <td><a href="https://playwright.dev/docs/api/class-locator#locator-set-input-files">locator.setInputFiles()</a></td>
+            <td>Pick files to upload</td>
+            </tr>
+            <tr>
+            <td><a href="https://playwright.dev/docs/api/class-locator#locator-select-option">locator.selectOption()</a></td>
+            <td>Select option in the drop down</td>
+            </tr>
+            </tbody>
+            </table>
             <h3>Assertions</h3>
-
             <p>Some convenience functions / syntactic sugar on assertions:</p>
-
-            <div style="overflow-x: auto; margin: var(--s2) 0;">
-                <table style="width: 100%; border-collapse: collapse;">
-                    <tr style="border-bottom: 1px solid var(--line);">
-                        <th style="text-align: left; padding: var(--s1);">Assertion</th>
-                        <th style="text-align: left; padding: var(--s1);">Description</th>
-                    </tr>
-                    <tr style="border-bottom: 1px solid var(--line);">
-                        <td style="padding: var(--s1);"><a href="https://playwright.dev/docs/api/class-locatorassertions#locator-assertions-to-be-checked">expect(locator).toBeChecked()</a></td>
-                        <td style="padding: var(--s1);">Checkbox is checked</td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid var(--line);">
-                        <td style="padding: var(--s1);"><a href="https://playwright.dev/docs/api/class-locatorassertions#locator-assertions-to-be-enabled">expect(locator).toBeEnabled()</a></td>
-                        <td style="padding: var(--s1);">Control is enabled</td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid var(--line);">
-                        <td style="padding: var(--s1);"><a href="https://playwright.dev/docs/api/class-locatorassertions#locator-assertions-to-be-visible">expect(locator).toBeVisible()</a></td>
-                        <td style="padding: var(--s1);">Element is visible</td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid var(--line);">
-                        <td style="padding: var(--s1);"><a href="https://playwright.dev/docs/api/class-locatorassertions#locator-assertions-to-contain-text">expect(locator).toContainText()</a></td>
-                        <td style="padding: var(--s1);">Element contains text</td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid var(--line);">
-                        <td style="padding: var(--s1);"><a href="https://playwright.dev/docs/api/class-locatorassertions#locator-assertions-to-have-attribute">expect(locator).toHaveAttribute()</a></td>
-                        <td style="padding: var(--s1);">Element has attribute</td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid var(--line);">
-                        <td style="padding: var(--s1);"><a href="https://playwright.dev/docs/api/class-locatorassertions#locator-assertions-to-have-count">expect(locator).toHaveCount()</a></td>
-                        <td style="padding: var(--s1);">List of elements has given length</td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid var(--line);">
-                        <td style="padding: var(--s1);"><a href="https://playwright.dev/docs/api/class-locatorassertions#locator-assertions-to-have-text">expect(locator).toHaveText()</a></td>
-                        <td style="padding: var(--s1);">Element matches text</td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid var(--line);">
-                        <td style="padding: var(--s1);"><a href="https://playwright.dev/docs/api/class-locatorassertions#locator-assertions-to-have-value">expect(locator).toHaveValue()</a></td>
-                        <td style="padding: var(--s1);">Input element has value</td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid var(--line);">
-                        <td style="padding: var(--s1);"><a href="https://playwright.dev/docs/api/class-pageassertions#page-assertions-to-have-title">expect(page).toHaveTitle()</a></td>
-                        <td style="padding: var(--s1);">Page has title</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: var(--s1);"><a href="https://playwright.dev/docs/api/class-pageassertions#page-assertions-to-have-url">expect(page).toHaveURL()</a></td>
-                        <td style="padding: var(--s1);">Page has URL</td>
-                    </tr>
-                </table>
-            </div>
-
-            <p>The locators, actions, and assertions are the syntactic sugar that keeps this framework reading like plain English.</p>
-        </section>
-
-        <section class="blog-section">
+            <table>
+            <thead>
+            <tr>
+            <th>Assertion</th>
+            <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+            <td><a href="https://playwright.dev/docs/api/class-locatorassertions#locator-assertions-to-be-checked">expect(locator).toBeChecked()</a></td>
+            <td>Checkbox is checked</td>
+            </tr>
+            <tr>
+            <td><a href="https://playwright.dev/docs/api/class-locatorassertions#locator-assertions-to-be-enabled">expect(locator).toBeEnabled()</a></td>
+            <td>Control is enabled</td>
+            </tr>
+            <tr>
+            <td><a href="https://playwright.dev/docs/api/class-locatorassertions#locator-assertions-to-be-visible">expect(locator).toBeVisible()</a></td>
+            <td>Element is visible</td>
+            </tr>
+            <tr>
+            <td><a href="https://playwright.dev/docs/api/class-locatorassertions#locator-assertions-to-contain-text">expect(locator).toContainText()</a></td>
+            <td>Element contains text</td>
+            </tr>
+            <tr>
+            <td><a href="https://playwright.dev/docs/api/class-locatorassertions#locator-assertions-to-have-attribute">expect(locator).toHaveAttribute()</a></td>
+            <td>Element has attribute</td>
+            </tr>
+            <tr>
+            <td><a href="https://playwright.dev/docs/api/class-locatorassertions#locator-assertions-to-have-count">expect(locator).toHaveCount()</a></td>
+            <td>List of elements has given length</td>
+            </tr>
+            <tr>
+            <td><a href="https://playwright.dev/docs/api/class-locatorassertions#locator-assertions-to-have-text">expect(locator).toHaveText()</a></td>
+            <td>Element matches text</td>
+            </tr>
+            <tr>
+            <td><a href="https://playwright.dev/docs/api/class-locatorassertions#locator-assertions-to-have-value">expect(locator).toHaveValue()</a></td>
+            <td>Input element has value</td>
+            </tr>
+            <tr>
+            <td><a href="https://playwright.dev/docs/api/class-pageassertions#page-assertions-to-have-title">expect(page).toHaveTitle()</a></td>
+            <td>Page has title</td>
+            </tr>
+            <tr>
+            <td><a href="https://playwright.dev/docs/api/class-pageassertions#page-assertions-to-have-url">expect(page).toHaveURL()</a></td>
+            <td>Page has URL</td>
+            </tr>
+            </tbody>
+            </table>
+            <p>The locators, actions, and assertions are the syntactic sugar that keeps this framework reading like plain english. </p>
             <h3>Fixtures and Hooks</h3>
-
             <p>Fixtures are context packages like browser or page, hooks are triggers like "before every test" or "after all tests complete".</p>
-
-            <p>Familiar from Selenium; a lot of this is going to be stuff I used to have to write myself but now it's just baked into the framework.</p>
-
-            <p>Writing a hook to create a test user, log in, yield for the test, and then delete the user may be useful, but the core "open a browser" kind of fixture and the concept of page classes is certainly baked in.</p>
+            <p>Familiar from selenium; a lot of this is going to be stuff I used to have to write myself but now it's just baked into the framework. </p>
+            <p>Writing a hook to create a test user, log in, yield for the test, and then delete the user may be useful, but the core "open a browser" kind of fixture and the concept of page classes is certainly baked in. </p>
+            <hr />
         </section>
 
         <section class="blog-section">
             <h2>Generating Tests</h2>
-
             <p>CodeGen is a cool little tool that allows you to generate code by navigating around a website.</p>
-
-            <p>Not to keep harping on "get things how the user gets them, not by <code>data-testid</code>", but check this test out:</p>
-
+            <p>Not to keep harping on "get things how the user gets them, not by data-testid", but check this test out: </p>
             <pre><code class="language-typescript">import { test, expect } from '@playwright/test';
-
-test('test', async ({ page }) => {
-  await page.goto('https://www.google.com/');
-  await page.getByRole('link', { name: 'Search for Images' }).click();
-  await expect(page.getByText('Images')).toBeVisible();
-});</code></pre>
-
+            
+            test('test', async ({ page }) =&gt; {
+              await page.goto('https://www.google.com/');
+              await page.getByRole('link', { name: 'Search for Images' }).click();
+              await expect(page.getByText('Images')).toBeVisible();
+            });
+            </code></pre>
             <p>The idea here was "go to google, click the images link, confirm we're at the image search page"</p>
-
             <p>But the "images" link that takes you to images.google.com is titled "Images", so both pages have something that matches <code>getByText('Images')</code></p>
-
-            <p>The proper method here is probably to assert we're at the url images.google.com, and I'm not saying every link should have a <code>data-testid</code> attribute. I think what itches is being told to "write code that interacts with the site the way a user does", because that's just not going to happen unless you use OCR for everything.</p>
-
-            <h3>PRANKD</h3>
-
+            <p>The proper method here is probably to assert we're at the url images.google.com , and I'm not saying every link should have a data-testid attribute. I think what itches is being told to "write code that interacts with the site the way a user does", because that's just not going to happen unless you use OCR for everything. </p>
+            <h4>PRANKD</h4>
             <p>Based on the above I thought I could comment out the second action (clicking the images link) and get a false positive out of the test. Not so!</p>
-
-            <pre><code>  5 |   await page.goto('https://www.google.com/');
-  6 |   // await page.getByRole('link', { name: 'Search for Images' }).click();
-> 7 |   await expect(page.getByText('Images')).toBeVisible();
-    |                                          ^
-  8 | });
-  9 |
-
-Error Context: test-results/google-navigation-test-chromium/error-context.md
-
-2) [webkit] › tests/google-navigation.spec.ts:4:5 › test ─────────────────────────────────────────
-
-Error: expect(locator).toBeVisible() failed</code></pre>
-
-            <p>So what happened?</p>
-
-            <p>I tried adding some logging before the click:</p>
-
-            <pre><code class="language-typescript">let images_text_count = await page.getByText('Images').count();
-console.log(`"get by text 'Images': " ${images_text_count}`)
-
-await page.getByRole('link', { name: 'Search for Images' }).click();</code></pre>
-
-            <p>And things are certainly being found that have "images" in the text:</p>
-
+            <pre><code>      5 |   await page.goto('https://www.google.com/');
+                  6 |   // await page.getByRole('link', { name: 'Search for Images' }).click();
+                &gt; 7 |   await expect(page.getByText('Images')).toBeVisible();
+                    |                                          ^
+                  8 | });
+                  9 |
+                    at /home/fundesk/Code/playwright_training/100_plays/002/tests/google-navigation.spec.ts:7:42
+            
+                Error Context: test-results/google-navigation-test-chromium/error-context.md
+            
+              2) [webkit] › tests/google-navigation.spec.ts:4:5 › test ─────────────────────────────────────────
+            
+                Error: expect(locator).toBeVisible() failed
+            
+            </code></pre>
+            <p>So what happened? </p>
+            <p>I tried adding some logging before the click: </p>
+            <pre><code class="language-typescript">  let images_text_count = await page.getByText('Images').count();
+              console.log(`&quot;get by text 'Images': &quot; ${images_text_count}`)
+            
+            
+              await page.getByRole('link', { name: 'Search for Images' }).click();
+            </code></pre>
+            <p>and things are certainly being found that have "images" in the text</p>
             <pre><code>Running 3 tests using 3 workers
-[chromium] › tests/google-navigation.spec.ts:4:5 › test
-diagnostic time!
-"get by text 'Images': " 3
-[webkit] › tests/google-navigation.spec.ts:4:5 › test
-diagnostic time!
-"get by text 'Images': " 4
-[firefox] › tests/google-navigation.spec.ts:4:5 › test
-diagnostic time!
-"get by text 'Images': " 4
-  3 passed (15.9s)</code></pre>
-
+            [chromium] › tests/google-navigation.spec.ts:4:5 › test
+            diagnostic time!
+            &quot;get by text 'Images': &quot; 3
+            [webkit] › tests/google-navigation.spec.ts:4:5 › test
+            diagnostic time!
+            &quot;get by text 'Images': &quot; 4
+            [firefox] › tests/google-navigation.spec.ts:4:5 › test
+            diagnostic time!
+            &quot;get by text 'Images': &quot; 4
+              3 passed (15.9s)
+            
+            </code></pre>
             <p>And with a bit more diagnostic code we can see that the first element found by our getter is exactly what I expected: the link</p>
-
-            <pre><code>&lt;a class="gb_6" aria-label="Search for Images " data-pid="2" href="https://www.google.com/imghp?hl=en&amp;ogbl" target="_top"&gt;Images&lt;/a&gt;</code></pre>
-
-            <p>After running the test many times with minimal changes, I started to see inconsistency in when the test would pass or fail. Once I even got it to fail in one browser but not another:</p>
-
-            <pre><code>  21 |
-  22 |
-> 23 |   await expect(page.getByText('Images')).toBeVisible();
-     |                                          ^
-  24 |
-  25 |
-  26 |   await page.getByRole('link', { name: 'Search for Images' }).click();
-
-Error Context: test-results/google-navigation-test-firefox/error-context.md
-
-2 failed
-  [chromium] › tests/google-navigation.spec.ts:4:5 › test ────────────────────────────────────────
-  [firefox] › tests/google-navigation.spec.ts:4:5 › test ─────────────────────────────────────────
-1 passed (15.9s)</code></pre>
-
+            <p><code>&lt;a class="gb_6" aria-label="Search for Images " data-pid="2" href="https://www.google.com/imghp?hl=en&amp;amp;ogbl" target="_top"&gt;Images&lt;/a&gt;</code></p>
+            <p>After running the test many times with minimal changes, I started to inconsistency in when the test would pass or fail. Once I even got it to fail in one browser but not another: </p>
+            <pre><code>      21 |
+                  22 |
+                &gt; 23 |   await expect(page.getByText('Images')).toBeVisible();
+                     |                                          ^
+                  24 |
+                  25 |
+                  26 |   await page.getByRole('link', { name: 'Search for Images' }).click();
+                    at /home/fundesk/Code/playwright_training/100_plays/002/tests/google-navigation.spec.ts:23:42
+            
+                Error Context: test-results/google-navigation-test-firefox/error-context.md
+            
+              2 failed
+                [chromium] › tests/google-navigation.spec.ts:4:5 › test ────────────────────────────────────────
+                [firefox] › tests/google-navigation.spec.ts:4:5 › test ─────────────────────────────────────────
+              1 passed (15.9s)
+            
+            </code></pre>
             <p>Given that all browsers have typically passed or failed together, I take this as an instance of "the same test passed/failed on the same run". So I thought it was a race condition.</p>
-
             <p>Well, if that were the case, adding implicit or explicit waits would have fixed it:</p>
-
-            <pre><code class="language-typescript">await page.waitForTimeout(1000);
-
-await expect(page.getByText('Images')).toBeVisible({
-  timeout: 10000
-});</code></pre>
-
-            <p>But it didn't.</p>
-
-            <h3>DOUBLE PRANKD</h3>
-
-            <p>I completely missed this part of the error output:</p>
-
-            <pre><code>Locator: getByText('Images')
-Expected: visible
-Error: strict mode violation: getByText('Images') resolved to 3 elements:</code></pre>
+            <pre><code class="language-typescript">  await page.waitForTimeout(1000);
+            
+              await expect(page.getByText('Images')).toBeVisible({
+                timeout: 10000
+              });
+            </code></pre>
+            <p>But it didn't. </p>
+            <h4>DOUBLE PRANKD</h4>
+            <p>I completely missed this part of the error output: </p>
+            <pre><code>    Locator: getByText('Images')
+                Expected: visible
+                Error: strict mode violation: getByText('Images') resolved to 3 elements:
+            
+            </code></pre>
+            <p>So real reason the test failed is that you can't assert "toBeVisible" against multiple elements.
+            And the second lesson is that playwright errors provide an "error" field that you should check out before climbing up the stack trace.</p>
         </section>
     </div>
-
-    <p>So real reason the test failed is that you can't assert "toBeVisible" against multiple elements.
-    And the second lesson is that playwright errors provide an "error" field that you should check out before climbing up the stack trace.</p>
-
 </article>
 
 <footer class="site-footer">

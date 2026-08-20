@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playwright Day 5 - Grouping Tests - Ocelot Code Systems Blog</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="site-header">
+    <div class="site-header-inner">
+        <a href="../index.html" class="site-brand">Ocelot Code Systems</a>
+        <nav class="site-nav">
+            <a href="../index.html">Home</a>
+            <a href="index.html">Blog</a>
+            <a href="../index.html#services">Services</a>
+            <a href="../index.html#contact">Contact</a>
+        </nav>
+    </div>
+</header>
+
+<article class="blog-post">
+    <header class="blog-header">
+        <h1 class="blog-title">Playwright Day 5 - Grouping Tests</h1>
+        <p class="post-metadata">
+            <time datetime="2026-08-19">August 19, 2026</time>
+        </p>
+    </header>
+
+    <div class="blog-content">
+        <section class="blog-section">
+            <p>Day 4 was supposed to be about grouping tests, but I got sidetracked debugging a resource issue. Still very valid experience, but now that it's done I can wrap up test grouping, then move on to CI integration and IDE integration.</p>
+            <p>I've created a series of tests using the organizational structures of folders, files, test names, and tags. Today I'd like to play around with running different combinations of tests by calling for different permutations of these organizational structures.</p>
+            <p>Here's the table of tests: </p>
+            <table>
+            <thead>
+            <tr>
+            <th>Directory</th>
+            <th>File</th>
+            <th>Test Name</th>
+            <th>Tag</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+            <td>red_tests</td>
+            <td>group_tiger.spec.ts</td>
+            <td>circle</td>
+            <td>one</td>
+            </tr>
+            <tr>
+            <td>red_tests</td>
+            <td>group_tiger.spec.ts</td>
+            <td>triangle</td>
+            <td>one</td>
+            </tr>
+            <tr>
+            <td>red_tests</td>
+            <td>group_tiger.spec.ts</td>
+            <td>square</td>
+            <td>one</td>
+            </tr>
+            <tr>
+            <td>red_tests</td>
+            <td>group_wolf.spec.ts</td>
+            <td>circle</td>
+            <td>two</td>
+            </tr>
+            <tr>
+            <td>red_tests</td>
+            <td>group_wolf.spec.ts</td>
+            <td>triangle</td>
+            <td>two</td>
+            </tr>
+            <tr>
+            <td>red_tests</td>
+            <td>group_wolf.spec.ts</td>
+            <td>square</td>
+            <td>two</td>
+            </tr>
+            <tr>
+            <td>blue_tests</td>
+            <td>group_giraffe.spec.ts</td>
+            <td>...</td>
+            <td>...</td>
+            </tr>
+            <tr>
+            <td>blue_tests</td>
+            <td>group_housecat.spec.ts</td>
+            <td>...</td>
+            <td>...</td>
+            </tr>
+            <tr>
+            <td>green_tests</td>
+            <td>group_bear.spec.ts</td>
+            <td>...</td>
+            <td>...</td>
+            </tr>
+            <tr>
+            <td>green_tests</td>
+            <td>group_ocelot.spec.ts</td>
+            <td>...</td>
+            <td>...</td>
+            </tr>
+            </tbody>
+            </table>
+            <p>In addition to these tests, I have a "test template" file with 10 tests in it.</p>
+            <p>For some reason, running all tests with this file alongside the others causes 84 tests to be run </p>
+            <pre><code>Running 84 tests using 4 workers
+              84 passed (1.7m)
+            </code></pre>
+            <p>But without it, only 18 tests. </p>
+            <pre><code>Running 18 tests using 4 workers
+            </code></pre>
+            <p>No problem, I can check the report and see where the extra tests are coming from.</p>
+            <p>Huh. I moved the 10-test template file back into the tests directory and now I'm getting the correct number of tests</p>
+            <pre><code>Running 28 tests using 4 workers
+            </code></pre>
+            <p>After moving the test around and eventually using this command</p>
+            <pre><code>$ npx playwright test --list
+            npm notice run 003@1.0.0 npx
+            npm notice run 'playwright' test --list
+            Listing tests:
+            
+            </code></pre>
+            <p>it lists 84 tests, across 3 browsers. So the clear difference is that sometimes it's running across all browsers, sometimes just one. </p>
+            <p>After a little investigation, I found that when I run the test list command from here:</p>
+            <p><code>playwright_training/100_plays/003</code></p>
+            <p>I get 3x as many times as when I run it from here</p>
+            <p><code>playwright_training/100_plays/003/tests</code></p>
+            <p>That's because the "playwright.config.ts" file where "projects" is defined, is in the first directory</p>
+            <pre><code>$ ls
+            node_modules  package-lock.json     playwright-report  template.spec.ts  tests
+            package.json  playwright.config.ts  README.md          test-results
+            $ grep -A15 &quot;Configure projects&quot; playwright.config.ts 
+              /* Configure projects for major browsers */
+              projects: [
+                {
+                  name: 'chromium',
+                  use: { ...devices['Desktop Chrome'] },
+                },
+            
+                {
+                  name: 'firefox',
+                  use: { ...devices['Desktop Firefox'] },
+                },
+            
+                {
+                  name: 'webkit',
+                  use: { ...devices['Desktop Safari'] },
+                },
+            
+            </code></pre>
+            <p>So it would run 3x as many tests when it can access that file. </p>
+            <p>Alright, back to grouping different permutations of tests</p>
+            <hr />
+        </section>
+
+        <section class="blog-section">
+            <h2>Specifying Tests</h2>
+            <p>Run everything:</p>
+            <p><code>npx playwright test</code></p>
+            <p>Run everything in a directory:</p>
+            <p><code>npx playwright test red_tests</code></p>
+            <p>Run one specific file:</p>
+            <p><code>npx playwright test red_tests/group_tiger.spec.ts</code></p>
+            <p>Run multiple specific files:</p>
+            <p><code>npx playwright test red_tests/group_tiger.spec.ts blue_tests/group_giraffe.spec.ts</code></p>
+            <h3>Using grep to specify tags and test names</h3>
+            <p>Select a test by name:</p>
+            <p><code>npx playwright test -g circle</code></p>
+            <p>Select by tag:</p>
+            <p><code>npx playwright test -g @one</code></p>
+            <h3>Combinations</h3>
+            <p>Directory and test name:</p>
+            <p><code>npx playwright test red_tests -g circle</code></p>
+            <p>Directory and tag:</p>
+            <p><code>npx playwright test red_tests -g @one</code></p>
+            <p>File and test name:</p>
+            <p><code>npx playwright test red_tests/group_tiger.spec.ts -g circle</code></p>
+            <p>File and tag:</p>
+            <p><code>npx playwright test red_tests/group_tiger.spec.ts -g @one</code></p>
+            <p>And you can add projects (which by default are browsers) to any run command like so: </p>
+            <p><code>npx playwright test red_tests --project=firefox</code></p>
+            <h3>Boolean operators with grep</h3>
+            <p>OR operator "|"</p>
+            <p><code>npx playwright test -g "@smoke|@critical"</code></p>
+            <p>Excluding tags:</p>
+            <p><code>npx playwright test --grep-invert @slow</code></p>
+            <p>You can combine this with the normal grep flag like a NOT operator, like so:</p>
+            <p><code>npx playwright test --grep @one --grep-invert @slow</code></p>
+            <p>There isn't an "AND" operator, you have to hack it together with grep lookaheads</p>
+            <p><code>npx playwright test --grep "(?=.*@one)(?=.*@slow)"</code></p>
+        </section>
+    </div>
+</article>
+
+<footer class="site-footer">
+    <p>&copy; 2026 Ocelot Code Systems. Built with intention, tested to prove.</p>
+</footer>
+</body>
+</html>

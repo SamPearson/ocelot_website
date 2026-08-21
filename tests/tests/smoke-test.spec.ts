@@ -19,7 +19,7 @@ test('load blog page', async ({page}) => {
 
 test('navigate to blog page', async({page}) => {
     await page.goto('/')
-    await page.getByRole('link', {name: 'blog'}).click()
+    await page.getByRole('navigation').getByRole('link', { name: 'Blog' }).click()
 
     await expect( page.getByRole('heading', {name: 'The Dev Blog'})).toBeVisible()
 

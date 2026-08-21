@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playwright Day 6 - CI/CD Integration - Ocelot Code Systems Blog</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="site-header">
+    <div class="site-header-inner">
+        <a href="../index.html" class="site-brand">Ocelot Code Systems</a>
+        <nav class="site-nav">
+            <a href="../index.html">Home</a>
+            <a href="index.html">Blog</a>
+            <a href="../index.html#services">Services</a>
+            <a href="../index.html#contact">Contact</a>
+        </nav>
+    </div>
+</header>
+
+<article class="blog-post">
+    <header class="blog-header">
+        <h1 class="blog-title">Playwright Day 6 - CI/CD Integration</h1>
+        <p class="post-metadata">
+            <time datetime="2026-08-21">August 21, 2026</time>
+        </p>
+    </header>
+
+    <div class="blog-content">
+        <section class="blog-section">
+
+        </section>
+
+        <section class="blog-section">
+            <h2>Preamble</h2>
+            <p>Second to last part of the playwright intro docs is about github actions integraiton. </p>
+            <p>I typically use jenkins for CI/CD, and have integrated tests into that before, but the playwright tutorials point to github actions, so this will be a nice opportunity to build a quick github integration.</p>
+        </section>
+
+        <section class="blog-section">
+            <h2>Plan</h2>
+            <p>I'll be using this page for testing: https://ocelotcodesystems.com/index.html</p>
+            <p>That's where I typically publish these blog posts and some dev stuff.</p>
+            <p>I have another project, a fullstack webapp, that I'll be using for more in-depth testing later, but for now I can just put together a quick smoke test </p>
+            <hr />
+        </section>
+
+        <section class="blog-section">
+            <h2>Parameterized URL</h2>
+            <p>Before actually configuring github actions I wondered about how to parameterize the URL that the test would run against and decided to figure that out first.</p>
+            <p>The playwright config file playwright.config.ts has this:</p>
+            <pre><code class="language-typescript">  use: {
+                /* Base URL to use in actions like `await page.goto('')`. */
+                // baseURL: 'http://localhost:3000',
+            
+            </code></pre>
+            <p>You can just pull in an environment variable near the top of the file, right below the dotenv configuration like so:</p>
+            <pre><code class="language-typescript">/**
+             * Read environment variables from file.
+             * https://github.com/motdotla/dotenv
+             */
+            // import dotenv from 'dotenv';
+            // import path from 'path';
+            // dotenv.config({ path: path.resolve(__dirname, '.env') });
+            
+            const baseURL = process.env.BASE_URL;
+            
+            if (!baseURL) {
+              throw new Error('BASE_URL environment variable is required');
+            }
+            </code></pre>
+            <p>I think it's right to do it up there, outside of the defineConfig function, so that you can throw an exception immediately if the variable isn't defined instead of waiting for a test to break.</p>
+            <p>So then in the defineConfig function,  instead of this:</p>
+            <pre><code class="language-typescript">  use: {
+                /* Base URL to use in actions like `await page.goto('')`. */
+                // baseURL: 'http://localhost:3000',
+            
+            </code></pre>
+            <p>We have this:</p>
+            <pre><code class="language-typescript">  use: {
+                /* Base URL to use in actions like `await page.goto('')`. */
+                baseURL,
+            </code></pre>
+            <p>And now all the URLs in our tests are relative:</p>
+            <pre><code class="language-typescript">    await page.goto('/');
+                await page.goto('/blog');
+                //etc
+            </code></pre>
+            <p>Big fan of that. </p>
+            <p>Just as a confirmation, I ran without setting the environment variable, and got a nice easy exception: </p>
+            <pre><code>npx playwright test tests/smoke_test.spec.ts
+            npm notice run 004@1.0.0 npx
+            npm notice run 'playwright' test tests/smoke_test.spec.ts
+            Error: BASE_URL environment variable is required
+            
+            </code></pre>
+            <hr />
+            <p>That may not be the right way to set things up though. I'll want the CI/CD server to spin up a webserver with the build candidate and test against that, instead of deploying and then testing. </p>
+            <p>So instead of configuring it like the above, another option would be to do this up top of playwright.config.ts : </p>
+            <p><code>const baseURL = process.env.BASE_URL || 'http://127.0.0.1:8000';</code></p>
+            <p>And then down at the bottom of the file there's a commented out web server section, where it wants to spin up node </p>
+            <pre><code class="language-typescript">  /* Run your local dev server before starting the tests */
+              // webServer: {
+              //   command: 'npm run start',
+              //   url: 'http://localhost:3000',
+              //   reuseExistingServer: !process.env.CI,
+              // },
+            </code></pre>
+            <p>But since this project is just a little html and css site, I can get away with just using a minimal python http server</p>
+            <pre><code class="language-typescript">  // basic python http server instead of node
+              webServer: {
+                command: 'python3 -m http.server 8000 -d ..',
+                url: 'http://127.0.0.1:8000',
+                reuseExistingServer: !process.env.CI,
+              },
+            </code></pre>
+            <hr />
+            <p>I did a push with it set up like this, and it failed, which is great! An opportunity for me to look through some logs and see the results from github actions.</p>
+            <p>The failure is clear: </p>
+            <pre><code>Error: locator.click: Error: strict mode violation: getByRole('link', { name: 'blog' }) resolved to 2 elements:
+            </code></pre>
+            <p>And the github action summary makes the playwright html report available for download </p>
+            <p>So now I can just run the tests on my desktop in UI mode, find a better locator, and push again.</p>
+            <p>Actually, everything passes locally </p>
+            <pre><code>$ npx playwright test tests/smoke_test.spec.ts
+            npm notice run 004@1.0.0 npx
+            npm notice run 'playwright' test tests/smoke_test.spec.ts
+            
+            Running 9 tests using 4 workers
+              9 passed (33.0s)
+            
+            </code></pre>
+            <p>Ah. It runs locally because the locator ('link', name: 'blog') pulls one element on the old version of the site, but the new version of the site actually has a second link named 'show all blog posts', so that's the discrepancy. </p>
+            <p>The fix is simple: a more specific locator: </p>
+            <p><code>await page.getByRole('navigation').getByRole('link', { name: 'Blog' }).click()</code></p>
+            <p>The link I want to click is in the nav bar, so we narrow it down to the nav tag first.</p>
+            <p>But that's a nice simple exploration of github actions. Tomorrow I can look into jenkins, or just write more tests.</p>
+        </section>
+    </div>
+</article>
+
+<footer class="site-footer">
+    <p>&copy; 2026 Ocelot Code Systems. Built with intention, tested to prove.</p>
+</footer>
+</body>
+</html>

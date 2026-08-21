@@ -8,11 +8,7 @@ import { defineConfig, devices } from '@playwright/test';
 // import path from 'path';
 // dotenv.config({ path: path.resolve(__dirname, '.env') });
 
-const baseURL = process.env.BASE_URL;
-
-if (!baseURL) {
-  throw new Error('BASE_URL environment variable is required');
-}
+const baseURL = process.env.BASE_URL || 'http://127.0.0.1:8000';
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -82,4 +78,12 @@ export default defineConfig({
   //   url: 'http://localhost:3000',
   //   reuseExistingServer: !process.env.CI,
   // },
+
+  // basic python http server instead of node
+  webServer: {
+    command: 'python3 -m http.server 8000 -d ..',
+    url: 'http://127.0.0.1:8000',
+    reuseExistingServer: !process.env.CI,
+  },
+
 });
